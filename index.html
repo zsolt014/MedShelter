@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedShelter – Bejelentkezés &amp; Felhasználók</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#123A5E;       /* sötétkék */
+    --primary-dark:#0B2740;
+    --secondary:#4E93C9;     /* világoskék */
+    --secondary-light:#EAF3FA;
+    --success:#2E9E5B;       /* zöld */
+    --success-light:#E6F5EC;
+    --warning:#E0902E;       /* narancs */
+    --warning-light:#FBF0E1;
+    --error:#D14343;         /* piros */
+    --error-light:#FBEAEA;
+    --bg:#F2F4F7;            /* világosszürke */
+    --surface:#FFFFFF;
+    --border:#E1E5EA;
+    --text:#1C2733;
+    --text-muted:#647082;
+    --radius:12px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', system-ui, sans-serif;
+  }
+  h1,h2,h3,.brand{ font-family:'Manrope', 'Inter', sans-serif; }
+
+  button{ font-family:inherit; cursor:pointer; }
+  input, select{ font-family:inherit; }
+
+  /* ---------------- LOGO MARK ---------------- */
+  .logo-mark{
+    width:44px; height:44px; flex-shrink:0;
+  }
+
+  /* ---------------- LOGIN SCREEN ---------------- */
+  #loginScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:
+      radial-gradient(circle at 12% 15%, rgba(78,147,201,0.16), transparent 45%),
+      radial-gradient(circle at 88% 85%, rgba(18,58,94,0.12), transparent 50%),
+      var(--bg);
+  }
+
+  .login-card{
+    width:100%;
+    max-width:400px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:40px 36px 32px;
+    box-shadow:0 20px 45px rgba(18,58,94,0.10);
+  }
+
+  .login-brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .login-brand .brand{
+    font-weight:800;
+    font-size:1.5rem;
+    color:var(--primary);
+    letter-spacing:-0.02em;
+  }
+  .login-sub{
+    color:var(--text-muted);
+    font-size:0.88rem;
+    margin:0 0 28px;
+    line-height:1.4;
+  }
+
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-size:0.82rem;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  .field-input-wrap{ position:relative; }
+  .field input{
+    width:100%;
+    padding:11px 14px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    font-size:0.95rem;
+    color:var(--text);
+    background:var(--surface);
+    transition:border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .field input:focus{
+    outline:none;
+    border-color:var(--secondary);
+    box-shadow:0 0 0 3px rgba(78,147,201,0.18);
+  }
+  .field input.has-error{
+    border-color:var(--error);
+  }
+
+  .toggle-visibility{
+    position:absolute;
+    right:10px; top:50%; transform:translateY(-50%);
+    background:none; border:none; padding:4px;
+    color:var(--text-muted);
+    display:flex;
+  }
+  .toggle-visibility:hover{ color:var(--primary); }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border:none;
+    border-radius:10px;
+    padding:12px 20px;
+    font-weight:700;
+    font-size:0.92rem;
+    transition:filter 0.15s ease, transform 0.1s ease;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--primary); color:#fff; width:100%; }
+  .btn-primary:hover{ filter:brightness(1.1); }
+  .btn-secondary{ background:var(--secondary-light); color:var(--primary); }
+  .btn-secondary:hover{ filter:brightness(0.97); }
+  .btn-danger-outline{ background:#fff; color:var(--error); border:1.5px solid var(--error-light); }
+  .btn-danger-outline:hover{ background:var(--error-light); }
+  .btn-ghost{ background:transparent; color:var(--text-muted); padding:8px 12px; }
+  .btn-ghost:hover{ color:var(--primary); }
+  .btn-sm{ padding:7px 12px; font-size:0.8rem; border-radius:8px; }
+
+  .login-footer-link{
+    text-align:center; margin-top:16px;
+  }
+  .login-footer-link a{
+    color:var(--secondary);
+    font-size:0.83rem;
+    text-decoration:none;
+    font-weight:600;
+  }
+  .login-footer-link a:hover{ text-decoration:underline; }
+
+  .alert{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    padding:11px 13px;
+    border-radius:10px;
+    font-size:0.83rem;
+    margin-bottom:16px;
+    line-height:1.4;
+  }
+  .alert-error{ background:var(--error-light); color:#9A2E2E; }
+  .alert-success{ background:var(--success-light); color:#1D7042; }
+  .alert-info{ background:var(--secondary-light); color:var(--primary); }
+
+  .shake{ animation:shake 0.4s ease; }
+  @keyframes shake{
+    10%,90%{ transform:translateX(-1px); }
+    20%,80%{ transform:translateX(2px); }
+    30%,50%,70%{ transform:translateX(-4px); }
+    40%,60%{ transform:translateX(4px); }
+  }
+
+  .demo-hint{
+    margin-top:22px;
+    padding:12px 14px;
+    background:var(--bg);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    font-size:0.76rem;
+    color:var(--text-muted);
+    line-height:1.5;
+  }
+  .demo-hint code{
+    background:#fff;
+    border:1px solid var(--border);
+    padding:1px 5px;
+    border-radius:5px;
+    font-size:0.75rem;
+    color:var(--primary);
+  }
+
+  /* ---------------- APP SHELL ---------------- */
+  #appShell{ display:none; min-height:100vh; }
+
+  .topbar{
+    height:64px;
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    position:sticky; top:0; z-index:10;
+  }
+  .topbar .login-brand .brand{ font-size:1.15rem; }
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
+  .user-chip{
+    display:flex; align-items:center; gap:9px;
+    background:var(--bg);
+    border-radius:999px;
+    padding:6px 14px 6px 6px;
+  }
+  .avatar{
+    width:30px; height:30px; border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.78rem;
+  }
+  .user-chip-name{ font-size:0.82rem; font-weight:600; }
+  .user-chip-role{ font-size:0.72rem; color:var(--text-muted); }
+
+  .layout{ display:flex; }
+  .sidebar{
+    width:230px;
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    min-height:calc(100vh - 64px);
+    padding:18px 12px;
+    flex-shrink:0;
+  }
+  .nav-item{
+    display:flex; align-items:center; gap:11px;
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:0.87rem;
+    font-weight:600;
+    color:var(--text-muted);
+    margin-bottom:2px;
+    cursor:pointer;
+    border:none;
+    background:none;
+    width:100%;
+    text-align:left;
+  }
+  .nav-item svg{ flex-shrink:0; opacity:0.75; }
+  .nav-item:hover{ background:var(--bg); color:var(--text); }
+  .nav-item.active{ background:var(--secondary-light); color:var(--primary); }
+  .nav-item.active svg{ opacity:1; }
+  .nav-item.disabled{ opacity:0.45; cursor:default; }
+  .nav-item.disabled:hover{ background:none; color:var(--text-muted); }
+
+  .main{ flex:1; padding:28px 32px; max-width:1100px; }
+
+  .page-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:20px; flex-wrap:wrap; gap:12px;
+  }
+  .page-header h2{ margin:0 0 4px; font-size:1.35rem; }
+  .page-header p{ margin:0; color:var(--text-muted); font-size:0.87rem; }
+
+  .placeholder-card{
+    background:var(--surface);
+    border:1px dashed var(--border);
+    border-radius:16px;
+    padding:60px 24px;
+    text-align:center;
+    color:var(--text-muted);
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+  }
+
+  table{ width:100%; border-collapse:collapse; }
+  thead tr{ background:var(--bg); }
+  th{
+    text-align:left;
+    font-size:0.74rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--text-muted);
+    padding:12px 18px;
+    font-weight:700;
+  }
+  td{
+    padding:14px 18px;
+    border-top:1px solid var(--border);
+    font-size:0.88rem;
+    vertical-align:middle;
+  }
+  tr.user-row:hover{ background:#FAFBFC; }
+
+  .name-cell{ display:flex; align-items:center; gap:10px; }
+  .username-tag{ color:var(--text-muted); font-size:0.78rem; }
+
+  .role-badge{
+    display:inline-block;
+    padding:3px 11px;
+    border-radius:999px;
+    font-size:0.72rem;
+    font-weight:700;
+  }
+  .role-admin{ background:var(--primary); color:#fff; }
+  .role-dolgozo{ background:var(--secondary-light); color:var(--primary); }
+  .role-vezeto{ background:var(--success-light); color:#1D7042; }
+
+  .row-actions{ display:flex; gap:6px; justify-content:flex-end; }
+  .icon-btn{
+    width:32px; height:32px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text-muted);
+  }
+  .icon-btn:hover{ background:var(--bg); color:var(--primary); }
+  .icon-btn.danger:hover{ background:var(--error-light); color:var(--error); border-color:var(--error-light); }
+
+  .footer-note{
+    display:flex; gap:9px; align-items:flex-start;
+    padding:14px 18px;
+    background:var(--bg);
+    border-top:1px solid var(--border);
+    font-size:0.77rem;
+    color:var(--text-muted);
+    line-height:1.5;
+  }
+
+  /* ---------------- MODAL ---------------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(18,29,41,0.45);
+    display:none;
+    align-items:center; justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal{
+    background:var(--surface);
+    border-radius:18px;
+    width:100%; max-width:440px;
+    padding:28px 28px 24px;
+    box-shadow:0 30px 70px rgba(18,58,94,0.28);
+  }
+  .modal-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .modal-header h3{ margin:0; font-size:1.1rem; }
+  .modal-close{
+    background:none; border:none; color:var(--text-muted);
+    display:flex; padding:4px;
+  }
+  .modal-close:hover{ color:var(--text); }
+
+  .field-row{ display:flex; gap:12px; }
+  .field-row .field{ flex:1; }
+
+  .field select{
+    width:100%;
+    padding:11px 14px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    font-size:0.92rem;
+    color:var(--text);
+    background:#fff;
+  }
+  .field select:focus{ outline:none; border-color:var(--secondary); }
+
+  .error-text{
+    color:var(--error);
+    font-size:0.76rem;
+    margin-top:5px;
+  }
+
+  .modal-actions{
+    display:flex; justify-content:flex-end; gap:10px; margin-top:22px;
+  }
+
+  /* ---------------- TOAST ---------------- */
+  #toast{
+    position:fixed;
+    bottom:26px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--success);
+    color:#fff;
+    padding:13px 22px;
+    border-radius:12px;
+    font-size:0.88rem;
+    font-weight:600;
+    box-shadow:0 14px 30px rgba(0,0,0,0.2);
+    display:flex; align-items:center; gap:10px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.25s ease, transform 0.25s ease;
+    z-index:200;
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  #toast.error{ background:var(--error); }
+
+  @media (max-width:720px){
+    .sidebar{ display:none; }
+    .main{ padding:20px 16px; }
+    .field-row{ flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <svg class="logo-mark" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="12" fill="#123A5E"/>
+        <path d="M22 9L34 16V24C34 30.5 29 34.5 22 37C15 34.5 10 30.5 10 24V16L22 9Z" fill="#EAF3FA"/>
+        <path d="M22 17V29M16 23H28" stroke="#123A5E" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand">MedShelter</span>
+    </div>
+    <p class="login-sub">Hajléktalanszálló Gyógyszerkezelő Rendszer — jelentkezz be az intézményi fiókoddal.</p>
+
+    <div id="loginAlert"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="loginUsername">Felhasználónév</label>
+        <input type="text" id="loginUsername" autocomplete="username" placeholder="pl. admin">
+      </div>
+      <div class="field">
+        <label for="loginPassword">Jelszó</label>
+        <div class="field-input-wrap">
+          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••">
+          <button type="button" class="toggle-visibility" data-target="loginPassword" aria-label="Jelszó megjelenítése">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Bejelentkezés</button>
+    </form>
+
+    <div class="login-footer-link">
+      <a href="#" onclick="return false;">Elfelejtett jelszó?</a>
+    </div>
+
+    <div class="demo-hint">
+      Prototípus mód – próbáld ki ezzel: <code>admin</code> / <code>admin123</code> (Admin), vagy <code>agnes</code> / <code>agnes123</code> (Dolgozó).
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="appShell">
+  <div class="topbar">
+    <div class="login-brand">
+      <svg class="logo-mark" width="34" height="34" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="12" fill="#123A5E"/>
+        <path d="M22 9L34 16V24C34 30.5 29 34.5 22 37C15 34.5 10 30.5 10 24V16L22 9Z" fill="#EAF3FA"/>
+        <path d="M22 17V29M16 23H28" stroke="#123A5E" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand">MedShelter</span>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="avatar" id="topAvatar">A</div>
+        <div>
+          <div class="user-chip-name" id="topName">—</div>
+          <div class="user-chip-role" id="topRole">—</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Kijelentkezés</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <button class="nav-item disabled">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item disabled">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Lakók
+      </button>
+      <button class="nav-item disabled">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.5 20.5 21 10a2.12 2.12 0 0 0-3-3L7.5 17.5 6 21z"/><path d="m14 6 3 3"/></svg>
+        Gyógyszerek
+      </button>
+      <button class="nav-item disabled">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Naptár
+      </button>
+      <button class="nav-item disabled">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg>
+        Jelentések
+      </button>
+      <button class="nav-item active" id="navUsers">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Felhasználók
+      </button>
+      <button class="nav-item disabled">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Beállítások
+      </button>
+    </div>
+
+    <div class="main">
+      <div class="page-header">
+        <div>
+          <h2>Felhasználók kezelése</h2>
+          <p>Hozz létre és kezelj bejelentkezési fiókokat a dolgozók és vezetők számára.</p>
+        </div>
+        <button class="btn btn-primary" id="openCreateBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Új felhasználó
+        </button>
+      </div>
+
+      <div class="panel">
+        <table>
+          <thead>
+            <tr>
+              <th>Név / Felhasználónév</th>
+              <th>Szerepkör</th>
+              <th style="text-align:right;">Műveletek</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+        <div class="footer-note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>Ez egy kattintható prototípus: a felhasználók és jelszavak csak ennek a böngészőlapnak a memóriájában élnek, frissítéskor elvesznek. Éles verzióban a jelszavakat a szerveren, sózva és hash-elve kell tárolni (pl. bcrypt), soha nem szabad azokat egyszerű szövegként menteni vagy a kliensen kezelni.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ USER MODAL (create / edit) ============ -->
+<div class="modal-overlay" id="userModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Új felhasználó létrehozása</h3>
+      <button class="modal-close" onclick="closeUserModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="userForm" novalidate>
+      <input type="hidden" id="editUserId" value="">
+
+      <div class="field">
+        <label for="fullName">Teljes név</label>
+        <input type="text" id="fullName" placeholder="pl. Kovács Ágnes">
+        <div class="error-text" id="err-fullName"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="username">Felhasználónév</label>
+          <input type="text" id="username" placeholder="pl. agnes">
+          <div class="error-text" id="err-username"></div>
+        </div>
+        <div class="field">
+          <label for="role">Szerepkör</label>
+          <select id="role">
+            <option value="Admin">Admin</option>
+            <option value="Dolgozó" selected>Dolgozó</option>
+            <option value="Vezető">Vezető</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="password">Jelszó</label>
+          <div class="field-input-wrap">
+            <input type="password" id="password" placeholder="min. 6 karakter">
+            <button type="button" class="toggle-visibility" data-target="password" aria-label="Jelszó megjelenítése">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="error-text" id="err-password"></div>
+        </div>
+        <div class="field">
+          <label for="passwordConfirm">Jelszó megerősítése</label>
+          <input type="password" id="passwordConfirm" placeholder="ismét">
+          <div class="error-text" id="err-passwordConfirm"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeUserModal()">Mégse</button>
+        <button type="submit" class="btn btn-primary" id="submitUserBtn">Létrehozás</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  /* ============ DEMO ADATTÁR (memóriában, nincs backend) ============ */
+  let users = [
+    { id:1, fullName:'Rendszergazda', username:'admin', password:'admin123', role:'Admin' },
+    { id:2, fullName:'Kovács Ágnes', username:'agnes', password:'agnes123', role:'Dolgozó' },
+    { id:3, fullName:'Nagy Béla', username:'bela', password:'bela123', role:'Vezető' }
+  ];
+  let nextId = 4;
+  let currentUser = null;
+
+  const roleClassMap = { 'Admin':'role-admin', 'Dolgozó':'role-dolgozo', 'Vezető':'role-vezeto' };
+
+  /* ============ TOAST ============ */
+  function showToast(message, isError){
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = isError ? 'error' : '';
+    requestAnimationFrame(() => toast.classList.add('show'));
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  /* ============ JELSZÓ LÁTHATÓSÁG ============ */
+  document.querySelectorAll('.toggle-visibility').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      target.type = target.type === 'password' ? 'text' : 'password';
+    });
+  });
+
+  /* ============ BEJELENTKEZÉS ============ */
+  const loginForm = document.getElementById('loginForm');
+  const loginAlert = document.getElementById('loginAlert');
+
+  loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const uname = document.getElementById('loginUsername').value.trim();
+    const pass = document.getElementById('loginPassword').value;
+
+    const found = users.find(u => u.username.toLowerCase() === uname.toLowerCase() && u.password === pass);
+
+    if(found){
+      currentUser = found;
+      loginAlert.innerHTML = '';
+      enterApp();
+    } else {
+      loginAlert.innerHTML = '<div class="alert alert-error">Hibás felhasználónév vagy jelszó. Próbáld újra.</div>';
+      const card = document.querySelector('.login-card');
+      card.classList.remove('shake');
+      void card.offsetWidth;
+      card.classList.add('shake');
+    }
+  });
+
+  function enterApp(){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').style.display = 'block';
+    document.getElementById('topName').textContent = currentUser.fullName;
+    document.getElementById('topRole').textContent = currentUser.role;
+    document.getElementById('topAvatar').textContent = currentUser.fullName.charAt(0).toUpperCase();
+    document.getElementById('loginForm').reset();
+    renderUserTable();
+  }
+
+  function logout(){
+    currentUser = null;
+    document.getElementById('appShell').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    loginAlert.innerHTML = '';
+  }
+
+  /* ============ FELHASZNÁLÓK TÁBLÁZAT ============ */
+  function renderUserTable(){
+    const tbody = document.getElementById('userTableBody');
+    tbody.innerHTML = '';
+    users.forEach(u => {
+      const tr = document.createElement('tr');
+      tr.className = 'user-row';
+      tr.innerHTML = `
+        <td>
+          <div class="name-cell">
+            <div class="avatar" style="background:${u.role === 'Admin' ? 'var(--primary)' : u.role === 'Vezető' ? 'var(--success)' : 'var(--secondary)'};">${u.fullName.charAt(0).toUpperCase()}</div>
+            <div>
+              <div>${escapeHtml(u.fullName)}</div>
+              <div class="username-tag">@${escapeHtml(u.username)}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="role-badge ${roleClassMap[u.role]}">${u.role}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" title="Szerkesztés" onclick="openEditModal(${u.id})">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+            </button>
+            <button class="icon-btn danger" title="Törlés" onclick="deleteUser(${u.id})">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+            </button>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /* ============ ÚJ / SZERKESZTÉS MODAL ============ */
+  const overlay = document.getElementById('userModalOverlay');
+  const userForm = document.getElementById('userForm');
+
+  document.getElementById('openCreateBtn').addEventListener('click', () => openCreateModal());
+
+  function clearErrors(){
+    ['fullName','username','password','passwordConfirm'].forEach(f => {
+      document.getElementById('err-' + f).textContent = '';
+      document.getElementById(f).classList.remove('has-error');
+    });
+  }
+
+  function openCreateModal(){
+    clearErrors();
+    userForm.reset();
+    document.getElementById('editUserId').value = '';
+    document.getElementById('modalTitle').textContent = 'Új felhasználó létrehozása';
+    document.getElementById('submitUserBtn').textContent = 'Létrehozás';
+    document.getElementById('password').placeholder = 'min. 6 karakter';
+    document.getElementById('password').required = true;
+    overlay.classList.add('show');
+    setTimeout(() => document.getElementById('fullName').focus(), 50);
+  }
+
+  function openEditModal(id){
+    const u = users.find(x => x.id === id);
+    if(!u) return;
+    clearErrors();
+    document.getElementById('editUserId').value = id;
+    document.getElementById('fullName').value = u.fullName;
+    document.getElementById('username').value = u.username;
+    document.getElementById('role').value = u.role;
+    document.getElementById('password').value = '';
+    document.getElementById('passwordConfirm').value = '';
+    document.getElementById('password').placeholder = 'hagyd üresen, ha nem változik';
+    document.getElementById('modalTitle').textContent = 'Felhasználó szerkesztése';
+    document.getElementById('submitUserBtn').textContent = 'Mentés';
+    overlay.classList.add('show');
+  }
+
+  function closeUserModal(){
+    overlay.classList.remove('show');
+  }
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeUserModal(); });
+
+  userForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearErrors();
+
+    const editId = document.getElementById('editUserId').value;
+    const isEdit = !!editId;
+
+    const fullName = document.getElementById('fullName').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const role = document.getElementById('role').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+    let valid = true;
+
+    if(!fullName){
+      document.getElementById('err-fullName').textContent = 'A teljes név megadása kötelező.';
+      document.getElementById('fullName').classList.add('has-error');
+      valid = false;
+    }
+
+    if(!username){
+      document.getElementById('err-username').textContent = 'A felhasználónév megadása kötelező.';
+      document.getElementById('username').classList.add('has-error');
+      valid = false;
+    } else {
+      const clash = users.find(u => u.username.toLowerCase() === username.toLowerCase() && String(u.id) !== String(editId));
+      if(clash){
+        document.getElementById('err-username').textContent = 'Ez a felhasználónév már foglalt.';
+        document.getElementById('username').classList.add('has-error');
+        valid = false;
+      }
+    }
+
+    if(!isEdit || password || passwordConfirm){
+      if(!password || password.length < 6){
+        document.getElementById('err-password').textContent = 'Legalább 6 karakter szükséges.';
+        document.getElementById('password').classList.add('has-error');
+        valid = false;
+      }
+      if(password !== passwordConfirm){
+        document.getElementById('err-passwordConfirm').textContent = 'A két jelszó nem egyezik.';
+        document.getElementById('passwordConfirm').classList.add('has-error');
+        valid = false;
+      }
+    }
+
+    if(!valid) return;
+
+    if(isEdit){
+      const u = users.find(x => String(x.id) === String(editId));
+      if(u){
+        u.fullName = fullName;
+        u.username = username;
+        u.role = role;
+        if(password) u.password = password;
+        if(currentUser && currentUser.id === u.id) currentUser = u;
+      }
+      showToast('Felhasználó mentve.');
+    } else {
+      users.push({ id: nextId++, fullName, username, password, role });
+      showToast('Új felhasználó létrehozva.');
+    }
+
+    closeUserModal();
+    renderUserTable();
+    if(currentUser){
+      document.getElementById('topName').textContent = currentUser.fullName;
+      document.getElementById('topRole').textContent = currentUser.role;
+      document.getElementById('topAvatar').textContent = currentUser.fullName.charAt(0).toUpperCase();
+    }
+  });
+
+  function deleteUser(id){
+    const u = users.find(x => x.id === id);
+    if(!u) return;
+
+    if(currentUser && currentUser.id === id){
+      showToast('A saját fiókodat nem törölheted, amíg be vagy jelentkezve.', true);
+      return;
+    }
+    const adminCount = users.filter(x => x.role === 'Admin').length;
+    if(u.role === 'Admin' && adminCount <= 1){
+      showToast('Legalább egy Admin felhasználónak maradnia kell.', true);
+      return;
+    }
+    if(!confirm(`Biztosan törlöd "${u.fullName}" felhasználót?`)) return;
+
+    users = users.filter(x => x.id !== id);
+    renderUserTable();
+    showToast('Felhasználó törölve.');
+  }
+</script>
+
+</body>
+</html>
