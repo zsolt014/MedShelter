@@ -36,5 +36,14 @@ app.post('/api/residents', async (req, res) => {
   }
 });
 
+// Gyökér útvonal teszteléshez (hogy ne 'Cannot GET /' hiba jelenjen meg)
+app.get('/', (req, res) => {
+  res.send('A MedShelter API szervere sikeresen fut!');
+});
+
+// A már meglévő API útvonalad:
+app.get('/api/residents', async (req, res) => {
+  // ...
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Szerver fut a ${PORT} porton`));
