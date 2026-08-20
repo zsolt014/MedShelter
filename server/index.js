@@ -110,17 +110,18 @@ app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
   try {
     const result = await pool.query('SELECT * FROM users WHERE LOWER(username) = LOWER($1)', [username]);
+    
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Hibás felhasználónév vagy jelszó.' });
     }
 
     const user = result.rows[0];
     
-    // Egyszerű ellenőrzés prototípushoz (Élesben bcrypt.compare javasolt)
     if (user.password !== password) {
       return res.status(401).json({ error: 'Hibás felhasználónév vagy jelszó.' });
     }
 
+    // A frontend a camelCase formátumot várja (fullName):
     res.json({
       id: user.id,
       fullName: user.full_name,
