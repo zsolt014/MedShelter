@@ -9,10 +9,10 @@ app.use(express.json());
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+  ssl: { rejectUnauthorized: false }
 });
 
-// Lakók lekérése
+// Lakók lekérése az adatbázisból
 app.get('/api/residents', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM residents ORDER BY id ASC');
@@ -22,7 +22,7 @@ app.get('/api/residents', async (req, res) => {
   }
 });
 
-// Új lakó felvétele
+// Új lakó mentése
 app.post('/api/residents', async (req, res) => {
   const { name, room, doctor, status, birth_date, taj, phone, notes } = req.body;
   try {
