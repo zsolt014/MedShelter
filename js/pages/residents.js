@@ -105,12 +105,59 @@ function closeResidentModal(){
 }
 residentOverlay.addEventListener('click', e => { if(e.target === residentOverlay) closeResidentModal(); });
 
-residentForm.addEventListener('submit', function(e){
+residentForm.addEventListener('submit', async function(e) {
   e.preventDefault();
   clearResidentErrors();
 
-  const editId = document.getElementById('editResidentId').value;
   const name = document.getElementById('res_fullName').value.trim();
+  const room = document.getElementById('res_room').value.trim();
+
+  // Alapvető mezőellenőrzés
+  let valid = true;
+  if (!name) {
+    document.getElementById('err-res_fullName').textContent = 'A név megadása kötelező.';
+    document.getElementById('res_fullName').classList.add('has-error');
+    valid = false;
+  }
+  if (!room) {
+    document.getElementById('err-res_room').textContent = 'A szoba megadása kötelező.';
+    document.getElementById('res_room').classList.add('has-error');
+    valid = false;
+  }
+  if (!valid) return;
+
+  // Az adatok előkészítése a szerver számára
+  const payload = {
+    name: name,
+    room: room,
+    status: document.getElementById('res_status').value,
+    doctor: document.getElementById('res_doctor').value.trim(),
+    birth_date: document.getElementById('res_birthDate').value.trim(),
+    taj: document.getElementById('res_taj').value.trim(),
+    phone: document.getElementById('res_phone').value.trim(),
+    notes: document.getElementById('res_notes').value.trim()
+  };
+
+  try {
+    // Adatküldés a Render szervernek (POST kérés)
+    const response = await fetch(`${API_BASE_URL}/residents`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      showToast('Új lakó elmentve az adatbázisba!');
+      closeResidentModal();
+      showResidentsList(); // Újratöltjük a listát az adatbázisból
+    } else {
+      showToast('Hiba történt a mentés során.', true);
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Hálózati hiba a mentés során!', true);
+  }
+});
   const room = document.getElementById('res_room').value.trim();
   const status = document.getElementById('res_status').value;
   const doctor = document.getElementById('res_doctor').value.trim();
