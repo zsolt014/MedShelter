@@ -133,3 +133,31 @@ app.post('/api/auth/login', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Bejelentkezés végpont
+app.post('/api/auth/login', async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE LOWER(username) = LOWER($1)', [username]);
+    
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Hibás felhasználónév vagy jelszó.' });
+    }
+
+    const user = result.rows[0];
+    
+    if (user.password !== password) {
+      return res.status(401).json({ error: 'Hibás felhasználónév vagy jelszó.' });
+    }
+
+    res.json({
+      id: user.id,
+      fullName: user.full_name,
+      username: user.username,
+      role: user.role
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
