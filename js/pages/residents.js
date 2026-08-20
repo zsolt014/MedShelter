@@ -1,9 +1,23 @@
 /* ---- Lakók lista ---- */
-function showResidentsList(){
+async function showResidentsList(){
   activeResidentId = null;
   document.getElementById('residentsListView').style.display = 'block';
   document.getElementById('residentDetailView').style.display = 'none';
-  renderResidentsTable(residents);
+
+  try {
+    // 1. Kérjük az adatokat a Render szervertől
+    const response = await fetch(`${API_BASE_URL}/residents`);
+    
+    // 2. Átalakítjuk a választ JSON (adat) formátumba
+    const residentsData = await response.json();
+    
+    // 3. Átadjuk az adatbázisból jött friss tömböt a táblázatrajzolónak
+    renderResidentsTable(residentsData);
+  } catch (error) {
+    console.error('Hiba történt:', error);
+    showToast('Nem sikerült betölteni a lakók listáját az adatbázisból.', true);
+  }
+}
 }
 
 function renderResidentsTable(list){
