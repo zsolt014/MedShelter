@@ -1,16 +1,25 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-app.use(cors());
 const { Pool } = require('pg');
-require('dotenv').config();
 
 const app = express();
+
+// Middleware-ek
 app.use(cors());
 app.use(express.json());
 
+// Adatbázis kapcsolat
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
+});
+
+// ============ ÚTVONALAK (ENDPOINTS) ============
+
+// Gyökér útvonal teszteléshez
+app.get('/', (req, res) => {
+  res.send('A MedShelter API szervere sikeresen fut!');
 });
 
 // Lakók lekérése az adatbázisból
@@ -36,20 +45,6 @@ app.post('/api/residents', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// Gyökér útvonal teszteléshez (hogy ne 'Cannot GET /' hiba jelenjen meg)
-app.get('/', (req, res) => {
-  res.send('A MedShelter API szervere sikeresen fut!');
-});
-
-// A már meglévő API útvonalad:
-app.get('/api/residents', async (req, res) => {
-  // ...
-});
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Szerver fut a ${PORT} porton`));
-
-// ============ 2. LAKÓ SZERKESZTÉSE ÉS TÖRLÉSE ============
 
 // Lakó szerkesztése (PUT)
 app.put('/api/residents/:id', async (req, res) => {
@@ -79,7 +74,7 @@ app.delete('/api/residents/:id', async (req, res) => {
   }
 });
 
-// ============ 3. GYÓGYSZEREK ENDPOINTOK ============
+// ============ GYÓGYSZEREK ENDPOINTOK ============
 
 // Adott lakó gyógyszerei
 app.get('/api/residents/:id/medications', async (req, res) => {
@@ -105,36 +100,8 @@ app.post('/api/medications', async (req, res) => {
   }
 });
 
-// ============ 4. BEJELENTKEZÉS (AUTH) ============
+// ============ BEJELENTKEZÉS (AUTH) ============
 
-app.post('/api/auth/login', async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const result = await pool.query('SELECT * FROM users WHERE LOWER(username) = LOWER($1)', [username]);
-    
-    if (result.rows.length === 0) {
-      return res.status(401).json({ error: 'Hibás felhasználónév vagy jelszó.' });
-    }
-
-    const user = result.rows[0];
-    
-    if (user.password !== password) {
-      return res.status(401).json({ error: 'Hibás felhasználónév vagy jelszó.' });
-    }
-
-    // A frontend a camelCase formátumot várja (fullName):
-    res.json({
-      id: user.id,
-      fullName: user.full_name,
-      username: user.username,
-      role: user.role
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Bejelentkezés végpont
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -161,3 +128,7 @@ app.post('/api/auth/login', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Szerver indítása (fájl legalján)
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Szerver fut a ${PORT} porton`));
