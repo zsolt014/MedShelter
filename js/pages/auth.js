@@ -10,12 +10,29 @@ document.querySelectorAll('.toggle-visibility').forEach(btn => {
 const loginForm = document.getElementById('loginForm');
 const loginAlert = document.getElementById('loginAlert');
 
-loginForm.addEventListener('submit', function(e){
+loginForm.addEventListener('submit', async function(e) {
   e.preventDefault();
   const uname = document.getElementById('loginUsername').value.trim();
   const pass = document.getElementById('loginPassword').value;
 
-  const found = users.find(u => u.username.toLowerCase() === uname.toLowerCase() && u.password === pass);
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: uname, password: pass })
+    });
+
+    if (res.ok) {
+      currentUser = await res.json();
+      loginAlert.innerHTML = '';
+      enterApp();
+    } else {
+      loginAlert.innerHTML = '<div class="alert alert-error">Hibás felhasználónév vagy jelszó.</div>';
+    }
+  } catch (err) {
+    showToast('Hálózati hiba a bejelentkezéskor!', true);
+  }
+});
 
   if(found){
     currentUser = found;
