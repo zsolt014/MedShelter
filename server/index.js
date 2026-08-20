@@ -1,17 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-// Adatbázis kapcsolat beállítása
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+const { Pool } = require('pg');
 
 const app = express();
 
-// A GitHub Pages és a helyi tesztkörnyezet engedélyezése
+// CORS beállítások (GitHub Pages engedélyezése)
 const allowedOrigins = [
   'https://zsolt014.github.io',
   'http://localhost:3000',
@@ -21,11 +15,10 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Ha nincs origin (pl. Postman vagy szerver-szerver kérés), vagy benne van a listában
     if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.github.io')) {
       callback(null, true);
     } else {
-      callback(null, true); // Vagy callback(new Error('CORS nem engedélyezett'))
+      callback(null, true);
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -33,21 +26,21 @@ const corsOptions = {
   credentials: true
 };
 
-// CORS middleware alkalmazása
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Preflight (OPTIONS) kérések kezelése minden útvonalra
-
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
-// Adatbázis kapcsolat
+// Adatbázis kapcsolat (CSAK EGYSZER DEKLARÁLVA)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // ============ ÚTVONALAK (ENDPOINTS) ============
 
-// Gyökér útvonal teszteléshez
+// Teszt útvonal
 app.get('/', (req, res) => {
   res.send('A MedShelter API szervere sikeresen fut!');
 });
