@@ -5,8 +5,32 @@ const { Pool } = require('pg');
 
 const app = express();
 
-// Middleware-ek
-app.use(cors());
+// A GitHub Pages és a helyi tesztkörnyezet engedélyezése
+const allowedOrigins = [
+  'https://zsolt014.github.io',
+  'http://localhost:3000',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Ha nincs origin (pl. Postman vagy szerver-szerver kérés), vagy benne van a listában
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.github.io')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Vagy callback(new Error('CORS nem engedélyezett'))
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+// CORS middleware alkalmazása
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Preflight (OPTIONS) kérések kezelése minden útvonalra
+
 app.use(express.json());
 
 // Adatbázis kapcsolat
@@ -129,6 +153,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Szerver indítása (fájl legalján)
+// Szerver indítása
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Szerver fut a ${PORT} porton`));
