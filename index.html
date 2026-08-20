@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedShelter – Bejelentkezés &amp; Felhasználók</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#123A5E;       /* sötétkék */
+    --primary-dark:#0B2740;
+    --secondary:#4E93C9;     /* világoskék */
+    --secondary-light:#EAF3FA;
+    --success:#2E9E5B;       /* zöld */
+    --success-light:#E6F5EC;
+    --warning:#E0902E;       /* narancs */
+    --warning-light:#FBF0E1;
+    --error:#D14343;         /* piros */
+    --error-light:#FBEAEA;
+    --bg:#F2F4F7;            /* világosszürke */
+    --surface:#FFFFFF;
+    --border:#E1E5EA;
+    --text:#1C2733;
+    --text-muted:#647082;
+    --radius:12px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', system-ui, sans-serif;
+  }
+  h1,h2,h3,.brand{ font-family:'Manrope', 'Inter', sans-serif; }
+
+  button{ font-family:inherit; cursor:pointer; }
+  input, select{ font-family:inherit; }
+
+  /* ---------------- LOGO MARK ---------------- */
+  .logo-mark{
+    width:44px; height:44px; flex-shrink:0;
+  }
+
+  /* ---------------- LOGIN SCREEN ---------------- */
+  #loginScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:
+      radial-gradient(circle at 12% 15%, rgba(78,147,201,0.16), transparent 45%),
+      radial-gradient(circle at 88% 85%, rgba(18,58,94,0.12), transparent 50%),
+      var(--bg);
+  }
+
+  .login-card{
+    width:100%;
+    max-width:400px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:40px 36px 32px;
+    box-shadow:0 20px 45px rgba(18,58,94,0.10);
+  }
+
+  .login-brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .login-brand .brand{
+    font-weight:800;
+    font-size:1.5rem;
+    color:var(--primary);
+    letter-spacing:-0.02em;
+  }
+  .login-sub{
+    color:var(--text-muted);
+    font-size:0.88rem;
+    margin:0 0 28px;
+    line-height:1.4;
+  }
+
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-size:0.82rem;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  .field-input-wrap{ position:relative; }
+  .field input{
+    width:100%;
+    padding:11px 14px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    font-size:0.95rem;
+    color:var(--text);
+    background:var(--surface);
+    transition:border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .field input:focus{
+    outline:none;
+    border-color:var(--secondary);
+    box-shadow:0 0 0 3px rgba(78,147,201,0.18);
+  }
+  .field input.has-error{
+    border-color:var(--error);
+  }
+
+  .toggle-visibility{
+    position:absolute;
+    right:10px; top:50%; transform:translateY(-50%);
+    background:none; border:none; padding:4px;
+    color:var(--text-muted);
+    display:flex;
+  }
+  .toggle-visibility:hover{ color:var(--primary); }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border:none;
+    border-radius:10px;
+    padding:12px 20px;
+    font-weight:700;
+    font-size:0.92rem;
+    transition:filter 0.15s ease, transform 0.1s ease;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--primary); color:#fff; width:100%; }
+  .btn-primary:hover{ filter:brightness(1.1); }
+  .btn-secondary{ background:var(--secondary-light); color:var(--primary); }
+  .btn-secondary:hover{ filter:brightness(0.97); }
+  .btn-danger-outline{ background:#fff; color:var(--error); border:1.5px solid var(--error-light); }
+  .btn-danger-outline:hover{ background:var(--error-light); }
+  .btn-ghost{ background:transparent; color:var(--text-muted); padding:8px 12px; }
+  .btn-ghost:hover{ color:var(--primary); }
+  .btn-sm{ padding:7px 12px; font-size:0.8rem; border-radius:8px; }
+
+  .login-footer-link{
+    text-align:center; margin-top:16px;
+  }
+  .login-footer-link a{
+    color:var(--secondary);
+    font-size:0.83rem;
+    text-decoration:none;
+    font-weight:600;
+  }
+  .login-footer-link a:hover{ text-decoration:underline; }
+
+  .alert{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    padding:11px 13px;
+    border-radius:10px;
+    font-size:0.83rem;
+    margin-bottom:16px;
+    line-height:1.4;
+  }
+  .alert-error{ background:var(--error-light); color:#9A2E2E; }
+  .alert-success{ background:var(--success-light); color:#1D7042; }
+  .alert-info{ background:var(--secondary-light); color:var(--primary); }
+
+  .shake{ animation:shake 0.4s ease; }
+  @keyframes shake{
+    10%,90%{ transform:translateX(-1px); }
+    20%,80%{ transform:translateX(2px); }
+    30%,50%,70%{ transform:translateX(-4px); }
+    40%,60%{ transform:translateX(4px); }
+  }
+
+  .demo-hint{
+    margin-top:22px;
+    padding:12px 14px;
+    background:var(--bg);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    font-size:0.76rem;
+    color:var(--text-muted);
+    line-height:1.5;
+  }
+  .demo-hint code{
+    background:#fff;
+    border:1px solid var(--border);
+    padding:1px 5px;
+    border-radius:5px;
+    font-size:0.75rem;
+    color:var(--primary);
+  }
+
+  /* ---------------- APP SHELL ---------------- */
+  #appShell{ display:none; min-height:100vh; }
+
+  .topbar{
+    height:64px;
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    position:sticky; top:0; z-index:10;
+  }
+  .topbar .login-brand .brand{ font-size:1.15rem; }
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
+  .user-chip{
+    display:flex; align-items:center; gap:9px;
+    background:var(--bg);
+    border-radius:999px;
+    padding:6px 14px 6px 6px;
+  }
+  .avatar{
+    width:30px; height:30px; border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.78rem;
+  }
+  .user-chip-name{ font-size:0.82rem; font-weight:600; }
+  .user-chip-role{ font-size:0.72rem; color:var(--text-muted); }
+
+  .layout{ display:flex; }
+  .sidebar{
+    width:230px;
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    min-height:calc(100vh - 64px);
+    padding:18px 12px;
+    flex-shrink:0;
+  }
+  .nav-item{
+    display:flex; align-items:center; gap:11px;
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:0.87rem;
+    font-weight:600;
+    color:var(--text-muted);
+    margin-bottom:2px;
+    cursor:pointer;
+    border:none;
+    background:none;
+    width:100%;
+    text-align:left;
+  }
+  .nav-item svg{ flex-shrink:0; opacity:0.75; }
+  .nav-item:hover{ background:var(--bg); color:var(--text); }
+  .nav-item.active{ background:var(--secondary-light); color:var(--primary); }
+  .nav-item.active svg{ opacity:1; }
+  .nav-item.disabled{ opacity:0.45; cursor:default; }
+  .nav-item.disabled:hover{ background:none; color:var(--text-muted); }
+
+  .main{ flex:1; padding:28px 32px; max-width:1100px; }
+
+  .page-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:20px; flex-wrap:wrap; gap:12px;
+  }
+  .page-header h2{ margin:0 0 4px; font-size:1.35rem; }
+  .page-header p{ margin:0; color:var(--text-muted); font-size:0.87rem; }
+
+  .placeholder-card{
+    background:var(--surface);
+    border:1px dashed var(--border);
+    border-radius:16px;
+    padding:60px 24px;
+    text-align:center;
+    color:var(--text-muted);
+  }
+
+  .page{ display:none; }
+  .page.active{ display:block; }
+
+  /* ---------------- DASHBOARD ---------------- */
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:16px;
+    margin-bottom:26px;
+  }
+  .stat-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:18px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .stat-card-top{
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .stat-icon{
+    width:36px; height:36px;
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .stat-value{ font-size:1.75rem; font-weight:800; font-family:'Manrope',sans-serif; line-height:1; }
+  .stat-label{ font-size:0.8rem; color:var(--text-muted); font-weight:600; }
+
+  .alert-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:16px;
+    margin-bottom:8px;
+  }
+  .alert-block{
+    border-radius:16px;
+    padding:18px 20px;
+    border:1px solid transparent;
+  }
+  .alert-block.urgent{ background:var(--error-light); border-color:#F2CACA; }
+  .alert-block.soon{ background:var(--warning-light); border-color:#F3DDBB; }
+  .alert-block.today{ background:var(--success-light); border-color:#C7E8D3; }
+
+  .alert-block-title{
+    display:flex; align-items:center; gap:8px;
+    font-weight:700; font-size:0.9rem; margin-bottom:12px;
+  }
+  .alert-block.urgent .alert-block-title{ color:#9A2E2E; }
+  .alert-block.soon .alert-block-title{ color:#8A5A16; }
+  .alert-block.today .alert-block-title{ color:#1D7042; }
+
+  .dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .dot.urgent{ background:var(--error); }
+  .dot.soon{ background:var(--warning); }
+  .dot.today{ background:var(--success); }
+
+  .alert-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px; }
+  .alert-list li{
+    font-size:0.83rem;
+    line-height:1.4;
+    color:var(--text);
+    display:flex;
+    gap:8px;
+  }
+  .alert-list li .dot{ margin-top:5px; }
+  .alert-list .empty{ color:var(--text-muted); font-style:italic; }
+
+  .section-title{
+    font-size:1rem;
+    font-weight:700;
+    margin:28px 0 12px;
+  }
+
+  @media (max-width:960px){
+    .stat-grid{ grid-template-columns:repeat(2, 1fr); }
+    .alert-grid{ grid-template-columns:1fr; }
+  }
+
+  /* ---------------- SEARCH BAR ---------------- */
+  .search-bar{
+    position:relative;
+    max-width:320px;
+    margin-bottom:16px;
+  }
+  .search-bar svg{
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:var(--text-muted);
+  }
+  .search-bar input{
+    width:100%;
+    padding:10px 14px 10px 36px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    font-size:0.88rem;
+    background:#fff;
+  }
+  .search-bar input:focus{
+    outline:none; border-color:var(--secondary);
+    box-shadow:0 0 0 3px rgba(78,147,201,0.18);
+  }
+
+  .status-badge{
+    display:inline-block; padding:3px 11px; border-radius:999px;
+    font-size:0.72rem; font-weight:700;
+  }
+  .status-aktiv{ background:var(--success-light); color:#1D7042; }
+  .status-figyelendo{ background:var(--warning-light); color:#8A5A16; }
+
+  .clickable-row{ cursor:pointer; }
+
+  .empty-state{
+    text-align:center; padding:40px 20px; color:var(--text-muted); font-size:0.88rem;
+  }
+
+  /* ---------------- LAKÓ ADATLAP ---------------- */
+  .back-link{
+    display:inline-flex; align-items:center; gap:6px;
+    background:none; border:none; color:var(--secondary);
+    font-weight:700; font-size:0.85rem; padding:0; margin-bottom:16px;
+  }
+  .back-link:hover{ text-decoration:underline; }
+
+  .profile-grid{
+    display:grid;
+    grid-template-columns:280px 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  .profile-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:22px;
+  }
+  .profile-avatar{
+    width:56px; height:56px; border-radius:14px;
+    background:var(--primary); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:1.3rem;
+    margin-bottom:14px;
+  }
+  .profile-name{ font-size:1.1rem; font-weight:700; margin-bottom:2px; }
+  .profile-sub{ color:var(--text-muted); font-size:0.82rem; margin-bottom:16px; }
+  .profile-field{ margin-bottom:12px; }
+  .profile-field-label{ font-size:0.72rem; text-transform:uppercase; letter-spacing:0.03em; color:var(--text-muted); font-weight:700; margin-bottom:2px; }
+  .profile-field-value{ font-size:0.88rem; }
+
+  .subpanel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    margin-bottom:18px;
+    overflow:hidden;
+  }
+  .subpanel-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px;
+    border-bottom:1px solid var(--border);
+  }
+  .subpanel-header h3{ margin:0; font-size:0.95rem; }
+
+  .validity-tag{ font-size:0.76rem; font-weight:700; display:inline-flex; align-items:center; gap:5px; }
+  .validity-tag .dot{ width:8px; height:8px; }
+
+  /* ---------------- NAPTÁR ---------------- */
+  .calendar-toolbar{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .calendar-month-label{ font-weight:700; font-size:1rem; min-width:150px; text-align:center; }
+  .calendar-legend{ display:flex; gap:16px; font-size:0.78rem; color:var(--text-muted); margin-bottom:14px; flex-wrap:wrap; }
+  .calendar-legend span{ display:inline-flex; align-items:center; gap:6px; }
+
+  .calendar-grid{
+    display:grid;
+    grid-template-columns:repeat(7, 1fr);
+    gap:8px;
+  }
+  .calendar-dow{
+    text-align:center; font-size:0.72rem; font-weight:700;
+    color:var(--text-muted); text-transform:uppercase;
+    padding-bottom:4px;
+  }
+  .calendar-cell{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    min-height:88px;
+    padding:8px;
+    display:flex; flex-direction:column; gap:5px;
+  }
+  .calendar-cell.empty{ background:transparent; border-color:transparent; }
+  .calendar-cell.today{ border-color:var(--secondary); box-shadow:0 0 0 2px rgba(78,147,201,0.18); }
+  .calendar-daynum{ font-size:0.8rem; font-weight:700; }
+  .calendar-events{ display:flex; flex-direction:column; gap:3px; }
+  .calendar-event{
+    font-size:0.68rem; font-weight:600;
+    padding:2px 6px; border-radius:6px;
+    display:flex; align-items:center; gap:4px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .calendar-event.red{ background:var(--error-light); color:#9A2E2E; }
+  .calendar-event.orange{ background:var(--warning-light); color:#8A5A16; }
+  .calendar-event.blue{ background:var(--secondary-light); color:var(--primary); }
+
+  /* ---------------- JELENTÉSEK ---------------- */
+  .bar-chart{ display:flex; flex-direction:column; gap:14px; }
+  .bar-row{ display:flex; align-items:center; gap:14px; }
+  .bar-row-label{ width:150px; font-size:0.83rem; color:var(--text-muted); flex-shrink:0; }
+  .bar-track{ flex:1; background:var(--bg); border-radius:8px; height:14px; overflow:hidden; }
+  .bar-fill{ height:100%; border-radius:8px; }
+  .bar-row-value{ width:36px; text-align:right; font-size:0.83rem; font-weight:700; flex-shrink:0; }
+
+  .report-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:20px; }
+  @media (max-width:960px){ .report-grid{ grid-template-columns:1fr; } .profile-grid{ grid-template-columns:1fr; } }
+
+  /* ---------------- BEÁLLÍTÁSOK ---------------- */
+  .settings-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:960px){ .settings-grid{ grid-template-columns:1fr; } }
+
+  .toggle-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:13px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .toggle-row:last-child{ border-bottom:none; }
+  .toggle-row-label{ font-size:0.87rem; font-weight:600; }
+  .toggle-row-sub{ font-size:0.76rem; color:var(--text-muted); margin-top:2px; }
+
+  .switch{ position:relative; width:42px; height:24px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .switch-track{
+    position:absolute; inset:0; background:var(--border); border-radius:999px; cursor:pointer;
+    transition:background 0.15s ease;
+  }
+  .switch-track::before{
+    content:''; position:absolute; width:18px; height:18px; left:3px; top:3px;
+    background:#fff; border-radius:50%; transition:transform 0.15s ease;
+    box-shadow:0 1px 3px rgba(0,0,0,0.25);
+  }
+  .switch input:checked + .switch-track{ background:var(--success); }
+  .switch input:checked + .switch-track::before{ transform:translateX(18px); }
+
+  .panel-pad{ padding:20px; }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+  }
+
+  table{ width:100%; border-collapse:collapse; }
+  thead tr{ background:var(--bg); }
+  th{
+    text-align:left;
+    font-size:0.74rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--text-muted);
+    padding:12px 18px;
+    font-weight:700;
+  }
+  td{
+    padding:14px 18px;
+    border-top:1px solid var(--border);
+    font-size:0.88rem;
+    vertical-align:middle;
+  }
+  tr.user-row:hover{ background:#FAFBFC; }
+
+  .name-cell{ display:flex; align-items:center; gap:10px; }
+  .username-tag{ color:var(--text-muted); font-size:0.78rem; }
+
+  .role-badge{
+    display:inline-block;
+    padding:3px 11px;
+    border-radius:999px;
+    font-size:0.72rem;
+    font-weight:700;
+  }
+  .role-admin{ background:var(--primary); color:#fff; }
+  .role-dolgozo{ background:var(--secondary-light); color:var(--primary); }
+  .role-vezeto{ background:var(--success-light); color:#1D7042; }
+
+  .row-actions{ display:flex; gap:6px; justify-content:flex-end; }
+  .icon-btn{
+    width:32px; height:32px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text-muted);
+  }
+  .icon-btn:hover{ background:var(--bg); color:var(--primary); }
+  .icon-btn.danger:hover{ background:var(--error-light); color:var(--error); border-color:var(--error-light); }
+
+  .footer-note{
+    display:flex; gap:9px; align-items:flex-start;
+    padding:14px 18px;
+    background:var(--bg);
+    border-top:1px solid var(--border);
+    font-size:0.77rem;
+    color:var(--text-muted);
+    line-height:1.5;
+  }
+
+  /* ---------------- MODAL ---------------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(18,29,41,0.45);
+    display:none;
+    align-items:center; justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal{
+    background:var(--surface);
+    border-radius:18px;
+    width:100%; max-width:440px;
+    padding:28px 28px 24px;
+    box-shadow:0 30px 70px rgba(18,58,94,0.28);
+  }
+  .modal-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .modal-header h3{ margin:0; font-size:1.1rem; }
+  .modal-close{
+    background:none; border:none; color:var(--text-muted);
+    display:flex; padding:4px;
+  }
+  .modal-close:hover{ color:var(--text); }
+
+  .field-row{ display:flex; gap:12px; }
+  .field-row .field{ flex:1; }
+
+  .field select{
+    width:100%;
+    padding:11px 14px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    font-size:0.92rem;
+    color:var(--text);
+    background:#fff;
+  }
+  .field select:focus{ outline:none; border-color:var(--secondary); }
+
+  .error-text{
+    color:var(--error);
+    font-size:0.76rem;
+    margin-top:5px;
+  }
+
+  .modal-actions{
+    display:flex; justify-content:flex-end; gap:10px; margin-top:22px;
+  }
+
+  /* ---------------- TOAST ---------------- */
+  #toast{
+    position:fixed;
+    bottom:26px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--success);
+    color:#fff;
+    padding:13px 22px;
+    border-radius:12px;
+    font-size:0.88rem;
+    font-weight:600;
+    box-shadow:0 14px 30px rgba(0,0,0,0.2);
+    display:flex; align-items:center; gap:10px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.25s ease, transform 0.25s ease;
+    z-index:200;
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  #toast.error{ background:var(--error); }
+
+  @media (max-width:720px){
+    .sidebar{ display:none; }
+    .main{ padding:20px 16px; }
+    .field-row{ flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <svg class="logo-mark" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="12" fill="#123A5E"/>
+        <path d="M22 9L34 16V24C34 30.5 29 34.5 22 37C15 34.5 10 30.5 10 24V16L22 9Z" fill="#EAF3FA"/>
+        <path d="M22 17V29M16 23H28" stroke="#123A5E" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand">MedShelter</span>
+    </div>
+    <p class="login-sub">Hajléktalanszálló Gyógyszerkezelő Rendszer — jelentkezz be az intézményi fiókoddal.</p>
+
+    <div id="loginAlert"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="loginUsername">Felhasználónév</label>
+        <input type="text" id="loginUsername" autocomplete="username" placeholder="pl. admin">
+      </div>
+      <div class="field">
+        <label for="loginPassword">Jelszó</label>
+        <div class="field-input-wrap">
+          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••">
+          <button type="button" class="toggle-visibility" data-target="loginPassword" aria-label="Jelszó megjelenítése">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Bejelentkezés</button>
+    </form>
+
+    <div class="login-footer-link">
+      <a href="#" onclick="return false;">Elfelejtett jelszó?</a>
+    </div>
+
+    <div class="demo-hint">
+      Prototípus mód – próbáld ki ezzel: <code>admin</code> / <code>admin123</code> (Admin), vagy <code>agnes</code> / <code>agnes123</code> (Dolgozó).
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="appShell">
+  <div class="topbar">
+    <div class="login-brand">
+      <svg class="logo-mark" width="34" height="34" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="12" fill="#123A5E"/>
+        <path d="M22 9L34 16V24C34 30.5 29 34.5 22 37C15 34.5 10 30.5 10 24V16L22 9Z" fill="#EAF3FA"/>
+        <path d="M22 17V29M16 23H28" stroke="#123A5E" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand">MedShelter</span>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="avatar" id="topAvatar">A</div>
+        <div>
+          <div class="user-chip-name" id="topName">—</div>
+          <div class="user-chip-role" id="topRole">—</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Kijelentkezés</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <button class="nav-item active" id="navDashboard" onclick="showPage('dashboard')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" id="navResidents" onclick="showPage('residents')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Lakók
+      </button>
+      <button class="nav-item" id="navMedications" onclick="showPage('medications')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.5 20.5 21 10a2.12 2.12 0 0 0-3-3L7.5 17.5 6 21z"/><path d="m14 6 3 3"/></svg>
+        Gyógyszerek
+      </button>
+      <button class="nav-item" id="navCalendar" onclick="showPage('calendar')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Naptár
+      </button>
+      <button class="nav-item" id="navReports" onclick="showPage('reports')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg>
+        Jelentések
+      </button>
+      <button class="nav-item" id="navUsers" onclick="showPage('users')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Felhasználók
+      </button>
+      <button class="nav-item" id="navSettings" onclick="showPage('settings')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Beállítások
+      </button>
+    </div>
+
+    <div class="main">
+
+      <!-- ============ DASHBOARD PAGE ============ -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h2>Áttekintés</h2>
+            <p>A mai legfontosabb tudnivalók egy pillantásra.</p>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon" style="background:var(--secondary-light);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">42</div>
+            <div class="stat-label">Lakók száma</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon" style="background:var(--success-light);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D7042" stroke-width="2"><path d="M10.5 20.5 21 10a2.12 2.12 0 0 0-3-3L7.5 17.5 6 21z"/><path d="m14 6 3 3"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">156</div>
+            <div class="stat-label">Aktív gyógyszerek</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon" style="background:var(--error-light);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">8</div>
+            <div class="stat-label">Lejáró gyógyszeriratások</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon" style="background:var(--warning-light);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Lejáró szakorvosi levelek</div>
+          </div>
+        </div>
+
+        <div class="section-title">Figyelmeztetések</div>
+        <div class="alert-grid">
+          <div class="alert-block urgent">
+            <div class="alert-block-title">
+              <span class="dot urgent"></span> Sürgős
+            </div>
+            <ul class="alert-list">
+              <li><span class="dot urgent"></span> Baróti Sándor gyógyszeriratása 5 napja lejárt.</li>
+              <li><span class="dot urgent"></span> Nagy Béla kardiológiai szakorvosi levele lejárt.</li>
+            </ul>
+          </div>
+
+          <div class="alert-block soon">
+            <div class="alert-block-title">
+              <span class="dot soon"></span> Hamarosan lejár
+            </div>
+            <ul class="alert-list">
+              <li><span class="dot soon"></span> Márk Zsolt pszichiátriai levele 12 nap múlva lejár.</li>
+              <li><span class="dot soon"></span> Aspenter gyógyszeriratás 2026.09.01-én esedékes.</li>
+            </ul>
+          </div>
+
+          <div class="alert-block today">
+            <div class="alert-block-title">
+              <span class="dot today"></span> Mai teendők
+            </div>
+            <ul class="alert-list">
+              <li><span class="dot today"></span> Teotard gyógyszert íratni Márk Zsoltnak.</li>
+              <li><span class="dot today"></span> Dilvas mennyiség ellenőrzése Baróti Sándornál.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ LAKÓK PAGE (list + detail) ============ -->
+      <div class="page" id="page-residents">
+
+        <div id="residentsListView">
+          <div class="page-header">
+            <div>
+              <h2>Lakók</h2>
+              <p>A szálló lakóinak listája, gyógyszereikkel és kezelőorvosukkal.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openResidentModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Új lakó
+            </button>
+          </div>
+
+          <div class="search-bar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="residentSearch" placeholder="Keresés név, gyógyszer vagy orvos szerint...">
+          </div>
+
+          <div class="panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Név</th>
+                  <th>Szoba</th>
+                  <th>Családorvos</th>
+                  <th>Állapot</th>
+                  <th style="text-align:right;">Műveletek</th>
+                </tr>
+              </thead>
+              <tbody id="residentsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="residentDetailView" style="display:none;"></div>
+      </div>
+
+      <!-- ============ GYÓGYSZEREK PAGE ============ -->
+      <div class="page" id="page-medications">
+        <div class="page-header">
+          <div>
+            <h2>Gyógyszeriratások</h2>
+            <p>Az összes lakó aktuális gyógyszeriratásainak áttekintése egy helyen.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openMedicationModal(null)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Új gyógyszeriratás
+          </button>
+        </div>
+
+        <div class="search-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="medicationSearch" placeholder="Keresés gyógyszer vagy lakó szerint...">
+        </div>
+
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Lakó</th>
+                <th>Gyógyszer</th>
+                <th>Utolsó iratás</th>
+                <th>Következő esedékes</th>
+                <th>Állapot</th>
+                <th style="text-align:right;">Műveletek</th>
+              </tr>
+            </thead>
+            <tbody id="medicationsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ NAPTÁR PAGE ============ -->
+      <div class="page" id="page-calendar">
+        <div class="page-header">
+          <div>
+            <h2>Naptár</h2>
+            <p>Lejáró iratások, szakorvosi levelek és tervezett vizsgálatok havi nézetben.</p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="calendar-toolbar">
+            <button class="icon-btn" onclick="shiftMonth(-1)" aria-label="Előző hónap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div class="calendar-month-label" id="calendarMonthLabel">—</div>
+            <button class="icon-btn" onclick="shiftMonth(1)" aria-label="Következő hónap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+
+          <div class="calendar-legend">
+            <span><span class="dot urgent"></span> Lejáró gyógyszeriratás</span>
+            <span><span class="dot soon"></span> Lejáró szakorvosi levél</span>
+            <span><span class="dot" style="background:var(--secondary);"></span> Tervezett orvosi vizsgálat</span>
+          </div>
+
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+      </div>
+
+      <!-- ============ JELENTÉSEK PAGE ============ -->
+      <div class="page" id="page-reports">
+        <div class="page-header">
+          <div>
+            <h2>Jelentések</h2>
+            <p>Összesített statisztikák és a rendszer módosítási előzményei.</p>
+          </div>
+        </div>
+
+        <div class="report-grid">
+          <div class="panel panel-pad">
+            <h3 style="margin-top:0; font-size:0.95rem;">Lakók állapot szerint</h3>
+            <div class="bar-chart" id="statusBarChart"></div>
+          </div>
+          <div class="panel panel-pad">
+            <h3 style="margin-top:0; font-size:0.95rem;">Szakorvosi levelek érvényessége</h3>
+            <div class="bar-chart" id="lettersBarChart"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="subpanel-header">
+            <h3>Előzmények (napló)</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Dátum</th>
+                <th>Felhasználó</th>
+                <th>Művelet</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ BEÁLLÍTÁSOK PAGE ============ -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <div>
+            <h2>Beállítások</h2>
+            <p>Profil- és értesítési beállítások kezelése.</p>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="panel panel-pad">
+            <h3 style="margin-top:0; font-size:0.95rem;">Profil</h3>
+            <div class="field">
+              <label for="settingsFullName">Teljes név</label>
+              <input type="text" id="settingsFullName">
+            </div>
+            <div class="field">
+              <label for="settingsEmail">E-mail cím</label>
+              <input type="text" id="settingsEmail" placeholder="pl. nev@zetelaki-camping-demo.hu">
+            </div>
+            <button class="btn btn-secondary" onclick="saveSettingsProfile()">Profil mentése</button>
+          </div>
+
+          <div class="panel panel-pad">
+            <h3 style="margin-top:0; font-size:0.95rem;">Értesítések</h3>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-row-label">Lejáró gyógyszeriratások</div>
+                <div class="toggle-row-sub">Figyelmeztetés belépéskor, ha egy iratás lejár.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="switch-track"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-row-label">Lejáró szakorvosi levelek</div>
+                <div class="toggle-row-sub">Figyelmeztetés 30 nappal a lejárat előtt.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="switch-track"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-row-label">E-mail emlékeztetők</div>
+                <div class="toggle-row-sub">Napi összefoglaló küldése e-mailben.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="switch-track"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ FELHASZNÁLÓK PAGE ============ -->
+      <div class="page" id="page-users">
+        <div class="page-header">
+          <div>
+            <h2>Felhasználók kezelése</h2>
+            <p>Hozz létre és kezelj bejelentkezési fiókokat a dolgozók és vezetők számára.</p>
+          </div>
+          <button class="btn btn-primary" id="openCreateBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Új felhasználó
+          </button>
+        </div>
+
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Név / Felhasználónév</th>
+                <th>Szerepkör</th>
+                <th style="text-align:right;">Műveletek</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+          <div class="footer-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Ez egy kattintható prototípus: a felhasználók és jelszavak csak ennek a böngészőlapnak a memóriájában élnek, frissítéskor elvesznek. Éles verzióban a jelszavakat a szerveren, sózva és hash-elve kell tárolni (pl. bcrypt), soha nem szabad azokat egyszerű szövegként menteni vagy a kliensen kezelni.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ USER MODAL (create / edit) ============ -->
+<div class="modal-overlay" id="userModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Új felhasználó létrehozása</h3>
+      <button class="modal-close" onclick="closeUserModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="userForm" novalidate>
+      <input type="hidden" id="editUserId" value="">
+
+      <div class="field">
+        <label for="fullName">Teljes név</label>
+        <input type="text" id="fullName" placeholder="pl. Kovács Ágnes">
+        <div class="error-text" id="err-fullName"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="username">Felhasználónév</label>
+          <input type="text" id="username" placeholder="pl. agnes">
+          <div class="error-text" id="err-username"></div>
+        </div>
+        <div class="field">
+          <label for="role">Szerepkör</label>
+          <select id="role">
+            <option value="Admin">Admin</option>
+            <option value="Dolgozó" selected>Dolgozó</option>
+            <option value="Vezető">Vezető</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="password">Jelszó</label>
+          <div class="field-input-wrap">
+            <input type="password" id="password" placeholder="min. 6 karakter">
+            <button type="button" class="toggle-visibility" data-target="password" aria-label="Jelszó megjelenítése">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="error-text" id="err-password"></div>
+        </div>
+        <div class="field">
+          <label for="passwordConfirm">Jelszó megerősítése</label>
+          <input type="password" id="passwordConfirm" placeholder="ismét">
+          <div class="error-text" id="err-passwordConfirm"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeUserModal()">Mégse</button>
+        <button type="submit" class="btn btn-primary" id="submitUserBtn">Létrehozás</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ LAKÓ MODAL (create / edit) ============ -->
+<div class="modal-overlay" id="residentModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="residentModalTitle">Új lakó felvétele</h3>
+      <button class="modal-close" onclick="closeResidentModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="residentForm" novalidate>
+      <input type="hidden" id="editResidentId" value="">
+
+      <div class="field">
+        <label for="res_fullName">Teljes név</label>
+        <input type="text" id="res_fullName" placeholder="pl. Kiss János">
+        <div class="error-text" id="err-res_fullName"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="res_room">Szoba</label>
+          <input type="text" id="res_room" placeholder="pl. 14">
+          <div class="error-text" id="err-res_room"></div>
+        </div>
+        <div class="field">
+          <label for="res_status">Állapot</label>
+          <select id="res_status">
+            <option value="Aktív" selected>Aktív</option>
+            <option value="Figyelendő">Figyelendő</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="res_doctor">Családorvos</label>
+          <input type="text" id="res_doctor" placeholder="pl. Dr. Demese">
+        </div>
+        <div class="field">
+          <label for="res_birthDate">Születési dátum</label>
+          <input type="text" id="res_birthDate" placeholder="ÉÉÉÉ.HH.NN">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="res_taj">TAJ/CNP</label>
+          <input type="text" id="res_taj" placeholder="pl. 123-456-789">
+        </div>
+        <div class="field">
+          <label for="res_phone">Telefonszám</label>
+          <input type="text" id="res_phone" placeholder="opcionális">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="res_notes">Megjegyzés</label>
+        <input type="text" id="res_notes" placeholder="opcionális">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeResidentModal()">Mégse</button>
+        <button type="submit" class="btn btn-primary" id="submitResidentBtn">Létrehozás</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ GYÓGYSZER MODAL (create / edit) ============ -->
+<div class="modal-overlay" id="medicationModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="medicationModalTitle">Új gyógyszer hozzáadása</h3>
+      <button class="modal-close" onclick="closeMedicationModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="medicationForm" novalidate>
+      <input type="hidden" id="editMedicationId" value="">
+      <input type="hidden" id="editMedicationResidentId" value="">
+
+      <div class="field" id="med_resident_field">
+        <label for="med_resident">Lakó</label>
+        <select id="med_resident"></select>
+      </div>
+
+      <div class="field">
+        <label for="med_name">Gyógyszer neve</label>
+        <input type="text" id="med_name" placeholder="pl. Aspenter">
+        <div class="error-text" id="err-med_name"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="med_dosage">Adagolás</label>
+          <input type="text" id="med_dosage" placeholder="pl. 1-0-1">
+        </div>
+        <div class="field">
+          <label for="med_qty">Havi mennyiség</label>
+          <input type="text" id="med_qty" placeholder="pl. 30">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="med_last">Utolsó iratás</label>
+          <input type="text" id="med_last" placeholder="ÉÉÉÉ.HH.NN">
+        </div>
+        <div class="field">
+          <label for="med_next">Következő esedékes</label>
+          <input type="text" id="med_next" placeholder="ÉÉÉÉ.HH.NN">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeMedicationModal()">Mégse</button>
+        <button type="submit" class="btn btn-primary" id="submitMedicationBtn">Létrehozás</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ SZAKORVOSI LEVÉL MODAL (create / edit) ============ -->
+<div class="modal-overlay" id="letterModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="letterModalTitle">Új szakorvosi levél</h3>
+      <button class="modal-close" onclick="closeLetterModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="letterForm" novalidate>
+      <input type="hidden" id="editLetterId" value="">
+      <input type="hidden" id="editLetterResidentId" value="">
+
+      <div class="field">
+        <label for="letter_specialty">Szakterület</label>
+        <input type="text" id="letter_specialty" placeholder="pl. Kardiológia">
+        <div class="error-text" id="err-letter_specialty"></div>
+      </div>
+
+      <div class="field">
+        <label for="letter_doctor">Orvos</label>
+        <input type="text" id="letter_doctor" placeholder="pl. Dr. Popescu">
+      </div>
+
+      <div class="field">
+        <label for="letter_valid">Érvényesség dátuma</label>
+        <input type="text" id="letter_valid" placeholder="ÉÉÉÉ.HH.NN">
+        <div class="error-text" id="err-letter_valid"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeLetterModal()">Mégse</button>
+        <button type="submit" class="btn btn-primary" id="submitLetterBtn">Létrehozás</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  /* ============ DEMO ADATTÁR (memóriában, nincs backend) ============ */
+  let users = [
+    { id:1, fullName:'Rendszergazda', username:'admin', password:'admin123', role:'Admin' },
+    { id:2, fullName:'Kovács Ágnes', username:'agnes', password:'agnes123', role:'Dolgozó' },
+    { id:3, fullName:'Nagy Béla', username:'bela', password:'bela123', role:'Vezető' }
+  ];
+  let nextId = 4;
+  let currentUser = null;
+
+  const roleClassMap = { 'Admin':'role-admin', 'Dolgozó':'role-dolgozo', 'Vezető':'role-vezeto' };
+
+  /* ============ TOAST ============ */
+  function showToast(message, isError){
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = isError ? 'error' : '';
+    requestAnimationFrame(() => toast.classList.add('show'));
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  /* ============ JELSZÓ LÁTHATÓSÁG ============ */
+  document.querySelectorAll('.toggle-visibility').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      target.type = target.type === 'password' ? 'text' : 'password';
+    });
+  });
+
+  /* ============ BEJELENTKEZÉS ============ */
+  const loginForm = document.getElementById('loginForm');
+  const loginAlert = document.getElementById('loginAlert');
+
+  loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const uname = document.getElementById('loginUsername').value.trim();
+    const pass = document.getElementById('loginPassword').value;
+
+    const found = users.find(u => u.username.toLowerCase() === uname.toLowerCase() && u.password === pass);
+
+    if(found){
+      currentUser = found;
+      loginAlert.innerHTML = '';
+      enterApp();
+    } else {
+      loginAlert.innerHTML = '<div class="alert alert-error">Hibás felhasználónév vagy jelszó. Próbáld újra.</div>';
+      const card = document.querySelector('.login-card');
+      card.classList.remove('shake');
+      void card.offsetWidth;
+      card.classList.add('shake');
+    }
+  });
+
+  function enterApp(){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').style.display = 'block';
+    document.getElementById('topName').textContent = currentUser.fullName;
+    document.getElementById('topRole').textContent = currentUser.role;
+    document.getElementById('topAvatar').textContent = currentUser.fullName.charAt(0).toUpperCase();
+    document.getElementById('loginForm').reset();
+    renderUserTable();
+    showPage('dashboard');
+  }
+
+  function logout(){
+    currentUser = null;
+    document.getElementById('appShell').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    loginAlert.innerHTML = '';
+  }
+
+  /* ============ OLDALVÁLTÁS ============ */
+  function showPage(name){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item:not(.disabled)').forEach(n => n.classList.remove('active'));
+
+    const page = document.getElementById('page-' + name);
+    if(page) page.classList.add('active');
+
+    const navMap = {
+      dashboard:'navDashboard', residents:'navResidents', medications:'navMedications',
+      calendar:'navCalendar', reports:'navReports', users:'navUsers', settings:'navSettings'
+    };
+    const navId = navMap[name];
+    if(navId) document.getElementById(navId).classList.add('active');
+
+    if(name === 'residents') showResidentsList();
+    if(name === 'medications') renderMedicationsTable();
+    if(name === 'calendar') renderCalendar();
+    if(name === 'reports') renderReports();
+    if(name === 'settings') fillSettingsForm();
+  }
+
+  /* ============ FELHASZNÁLÓK TÁBLÁZAT ============ */
+  function renderUserTable(){
+    const tbody = document.getElementById('userTableBody');
+    tbody.innerHTML = '';
+    users.forEach(u => {
+      const tr = document.createElement('tr');
+      tr.className = 'user-row';
+      tr.innerHTML = `
+        <td>
+          <div class="name-cell">
+            <div class="avatar" style="background:${u.role === 'Admin' ? 'var(--primary)' : u.role === 'Vezető' ? 'var(--success)' : 'var(--secondary)'};">${u.fullName.charAt(0).toUpperCase()}</div>
+            <div>
+              <div>${escapeHtml(u.fullName)}</div>
+              <div class="username-tag">@${escapeHtml(u.username)}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="role-badge ${roleClassMap[u.role]}">${u.role}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" title="Szerkesztés" onclick="openEditModal(${u.id})">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+            </button>
+            <button class="icon-btn danger" title="Törlés" onclick="deleteUser(${u.id})">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+            </button>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /* ============ ÚJ / SZERKESZTÉS MODAL ============ */
+  const overlay = document.getElementById('userModalOverlay');
+  const userForm = document.getElementById('userForm');
+
+  document.getElementById('openCreateBtn').addEventListener('click', () => openCreateModal());
+
+  function clearErrors(){
+    ['fullName','username','password','passwordConfirm'].forEach(f => {
+      document.getElementById('err-' + f).textContent = '';
+      document.getElementById(f).classList.remove('has-error');
+    });
+  }
+
+  function openCreateModal(){
+    clearErrors();
+    userForm.reset();
+    document.getElementById('editUserId').value = '';
+    document.getElementById('modalTitle').textContent = 'Új felhasználó létrehozása';
+    document.getElementById('submitUserBtn').textContent = 'Létrehozás';
+    document.getElementById('password').placeholder = 'min. 6 karakter';
+    document.getElementById('password').required = true;
+    overlay.classList.add('show');
+    setTimeout(() => document.getElementById('fullName').focus(), 50);
+  }
+
+  function openEditModal(id){
+    const u = users.find(x => x.id === id);
+    if(!u) return;
+    clearErrors();
+    document.getElementById('editUserId').value = id;
+    document.getElementById('fullName').value = u.fullName;
+    document.getElementById('username').value = u.username;
+    document.getElementById('role').value = u.role;
+    document.getElementById('password').value = '';
+    document.getElementById('passwordConfirm').value = '';
+    document.getElementById('password').placeholder = 'hagyd üresen, ha nem változik';
+    document.getElementById('modalTitle').textContent = 'Felhasználó szerkesztése';
+    document.getElementById('submitUserBtn').textContent = 'Mentés';
+    overlay.classList.add('show');
+  }
+
+  function closeUserModal(){
+    overlay.classList.remove('show');
+  }
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeUserModal(); });
+
+  userForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearErrors();
+
+    const editId = document.getElementById('editUserId').value;
+    const isEdit = !!editId;
+
+    const fullName = document.getElementById('fullName').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const role = document.getElementById('role').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+    let valid = true;
+
+    if(!fullName){
+      document.getElementById('err-fullName').textContent = 'A teljes név megadása kötelező.';
+      document.getElementById('fullName').classList.add('has-error');
+      valid = false;
+    }
+
+    if(!username){
+      document.getElementById('err-username').textContent = 'A felhasználónév megadása kötelező.';
+      document.getElementById('username').classList.add('has-error');
+      valid = false;
+    } else {
+      const clash = users.find(u => u.username.toLowerCase() === username.toLowerCase() && String(u.id) !== String(editId));
+      if(clash){
+        document.getElementById('err-username').textContent = 'Ez a felhasználónév már foglalt.';
+        document.getElementById('username').classList.add('has-error');
+        valid = false;
+      }
+    }
+
+    if(!isEdit || password || passwordConfirm){
+      if(!password || password.length < 6){
+        document.getElementById('err-password').textContent = 'Legalább 6 karakter szükséges.';
+        document.getElementById('password').classList.add('has-error');
+        valid = false;
+      }
+      if(password !== passwordConfirm){
+        document.getElementById('err-passwordConfirm').textContent = 'A két jelszó nem egyezik.';
+        document.getElementById('passwordConfirm').classList.add('has-error');
+        valid = false;
+      }
+    }
+
+    if(!valid) return;
+
+    if(isEdit){
+      const u = users.find(x => String(x.id) === String(editId));
+      if(u){
+        u.fullName = fullName;
+        u.username = username;
+        u.role = role;
+        if(password) u.password = password;
+        if(currentUser && currentUser.id === u.id) currentUser = u;
+      }
+      showToast('Felhasználó mentve.');
+    } else {
+      users.push({ id: nextId++, fullName, username, password, role });
+      showToast('Új felhasználó létrehozva.');
+    }
+
+    closeUserModal();
+    renderUserTable();
+    if(currentUser){
+      document.getElementById('topName').textContent = currentUser.fullName;
+      document.getElementById('topRole').textContent = currentUser.role;
+      document.getElementById('topAvatar').textContent = currentUser.fullName.charAt(0).toUpperCase();
+    }
+  });
+
+  function deleteUser(id){
+    const u = users.find(x => x.id === id);
+    if(!u) return;
+
+    if(currentUser && currentUser.id === id){
+      showToast('A saját fiókodat nem törölheted, amíg be vagy jelentkezve.', true);
+      return;
+    }
+    const adminCount = users.filter(x => x.role === 'Admin').length;
+    if(u.role === 'Admin' && adminCount <= 1){
+      showToast('Legalább egy Admin felhasználónak maradnia kell.', true);
+      return;
+    }
+    if(!confirm(`Biztosan törlöd "${u.fullName}" felhasználót?`)) return;
+
+    users = users.filter(x => x.id !== id);
+    renderUserTable();
+    showToast('Felhasználó törölve.');
+  }
+
+  /* ================= LAKÓK ================= */
+  const residents = [
+    {
+      id:1, name:'Baróti Sándor', room:'12', doctor:'Dr. Demese', status:'Aktív',
+      birthDate:'1968.03.14', taj:'123-456-789', phone:'—', notes:'Szoba: napos oldal, mankóval közlekedik.',
+      medications:[
+        { id:1, name:'Aspenter', dosage:'0-1-0', qty:30, last:'2026.08.01', next:'2026.08.20' },
+        { id:2, name:'Dilvas', dosage:'1-0-1', qty:60, last:'2026.07.10', next:'2026.08.10' }
+      ],
+      letters:[
+        { specialty:'Kardiológia', doctor:'Dr. Popescu', valid:'2026.11.15' },
+        { specialty:'Neurológia', doctor:'Dr. Farkas', valid:'2026.08.10' }
+      ]
+    },
+    {
+      id:2, name:'Márk Zsolt', room:'8', doctor:'Dr. Török', status:'Aktív',
+      birthDate:'1975.11.02', taj:'234-567-891', phone:'—', notes:'',
+      medications:[
+        { id:3, name:'Teotard', dosage:'1-0-0', qty:30, last:'2026.08.15', next:'2026.09.15' }
+      ],
+      letters:[
+        { specialty:'Pszichiátria', doctor:'Dr. Radu', valid:'2026.09.01' }
+      ]
+    },
+    {
+      id:3, name:'Nagy Béla', room:'5', doctor:'Dr. Demese', status:'Figyelendő',
+      birthDate:'1959.06.21', taj:'345-678-912', phone:'—', notes:'Rendszeres vérnyomás-ellenőrzés szükséges.',
+      medications:[
+        { id:4, name:'Coversyl', dosage:'1-0-0', qty:30, last:'2026.07.20', next:'2026.08.20' },
+        { id:5, name:'Trombex', dosage:'0-1-0', qty:30, last:'2026.07.20', next:'2026.08.20' }
+      ],
+      letters:[
+        { specialty:'Kardiológia', doctor:'Dr. Popescu', valid:'2026.08.05' }
+      ]
+    },
+    {
+      id:4, name:'Kelemen Ilona', room:'3', doctor:'Dr. Kiss', status:'Aktív',
+      birthDate:'1982.01.30', taj:'456-789-123', phone:'—', notes:'',
+      medications:[
+        { id:6, name:'Metfogamma', dosage:'1-0-1', qty:60, last:'2026.08.05', next:'2026.09.05' }
+      ],
+      letters:[
+        { specialty:'Endokrinológia', doctor:'Dr. Simon', valid:'2027.02.03' }
+      ]
+    },
+    {
+      id:5, name:'Varga Tamás', room:'15', doctor:'Dr. Török', status:'Figyelendő',
+      birthDate:'1990.09.12', taj:'567-891-234', phone:'—', notes:'Új beköltöző, adatlap kiegészítése folyamatban.',
+      medications:[],
+      letters:[]
+    }
+  ];
+
+  const historyLog = [
+    { date:'08.19 10:42', user:'Admin', action:'Gyógyszer módosítva – Baróti Sándor / Aspenter' },
+    { date:'08.19 09:15', user:'Kovács Ágnes', action:'Új gyógyszer felvéve – Kelemen Ilona / Metfogamma' },
+    { date:'08.18 16:03', user:'Nagy Béla', action:'Szakorvosi levél frissítve – Márk Zsolt / Pszichiátria' },
+    { date:'08.17 11:20', user:'Admin', action:'Új lakó felvéve – Varga Tamás' },
+    { date:'08.15 08:47', user:'Kovács Ágnes', action:'Gyógyszeriratás rögzítve – Nagy Béla / Coversyl' }
+  ];
+
+  let activeResidentId = null;
+  let nextResidentId = 6;
+  let nextMedicationId = 100;
+  let nextLetterId = 200;
+
+  function daysUntil(dateStr){
+    const [y,m,d] = dateStr.split('.').map(Number);
+    const target = new Date(y, m-1, d);
+    const today = new Date(2026, 7, 20); // 2026.08.20 - a rendszer "mai" dátuma
+    return Math.round((target - today) / 86400000);
+  }
+
+  function urgencyOf(dateStr){
+    const diff = daysUntil(dateStr);
+    if(diff < 0) return 'urgent';
+    if(diff <= 30) return 'soon';
+    return 'ok';
+  }
+
+  /* ---- Lakók lista ---- */
+  function showResidentsList(){
+    activeResidentId = null;
+    document.getElementById('residentsListView').style.display = 'block';
+    document.getElementById('residentDetailView').style.display = 'none';
+    renderResidentsTable(residents);
+  }
+
+  function renderResidentsTable(list){
+    const tbody = document.getElementById('residentsTableBody');
+    if(list.length === 0){
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">Nincs a keresésnek megfelelő lakó.</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = list.map(r => `
+      <tr class="user-row clickable-row" onclick="openResidentDetail(${r.id})">
+        <td>
+          <div class="name-cell">
+            <div class="avatar" style="background:var(--secondary);">${r.name.charAt(0)}</div>
+            <div>${escapeHtml(r.name)}</div>
+          </div>
+        </td>
+        <td>${escapeHtml(r.room)}</td>
+        <td>${escapeHtml(r.doctor)}</td>
+        <td><span class="status-badge ${r.status === 'Aktív' ? 'status-aktiv' : 'status-figyelendo'}">${r.status}</span></td>
+        <td>
+          <div class="row-actions" onclick="event.stopPropagation();">
+            <button class="icon-btn" title="Szerkesztés" onclick="openResidentModal(${r.id})">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+            </button>
+            <button class="icon-btn danger" title="Törlés" onclick="deleteResident(${r.id})">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  document.addEventListener('input', function(e){
+    if(e.target.id === 'residentSearch'){
+      const q = e.target.value.trim().toLowerCase();
+      const filtered = residents.filter(r =>
+        r.name.toLowerCase().includes(q) ||
+        r.doctor.toLowerCase().includes(q) ||
+        r.medications.some(m => m.name.toLowerCase().includes(q))
+      );
+      renderResidentsTable(filtered);
+    }
+    if(e.target.id === 'medicationSearch'){
+      renderMedicationsTable(e.target.value.trim().toLowerCase());
+    }
+  });
+
+  /* ---- Lakó felvétel / szerkesztés ---- */
+  const residentOverlay = document.getElementById('residentModalOverlay');
+  const residentForm = document.getElementById('residentForm');
+
+  function clearResidentErrors(){
+    ['res_fullName','res_room'].forEach(f => {
+      document.getElementById('err-' + f).textContent = '';
+      document.getElementById(f).classList.remove('has-error');
+    });
+  }
+
+  function openResidentModal(id){
+    clearResidentErrors();
+    residentForm.reset();
+    if(id){
+      const r = residents.find(x => x.id === id);
+      if(!r) return;
+      document.getElementById('editResidentId').value = id;
+      document.getElementById('res_fullName').value = r.name;
+      document.getElementById('res_room').value = r.room;
+      document.getElementById('res_status').value = r.status;
+      document.getElementById('res_doctor').value = r.doctor;
+      document.getElementById('res_birthDate').value = r.birthDate;
+      document.getElementById('res_taj').value = r.taj;
+      document.getElementById('res_phone').value = r.phone === '—' ? '' : r.phone;
+      document.getElementById('res_notes').value = r.notes;
+      document.getElementById('residentModalTitle').textContent = 'Lakó adatainak szerkesztése';
+      document.getElementById('submitResidentBtn').textContent = 'Mentés';
+    } else {
+      document.getElementById('editResidentId').value = '';
+      document.getElementById('residentModalTitle').textContent = 'Új lakó felvétele';
+      document.getElementById('submitResidentBtn').textContent = 'Létrehozás';
+    }
+    residentOverlay.classList.add('show');
+    setTimeout(() => document.getElementById('res_fullName').focus(), 50);
+  }
+
+  function closeResidentModal(){
+    residentOverlay.classList.remove('show');
+  }
+  residentOverlay.addEventListener('click', e => { if(e.target === residentOverlay) closeResidentModal(); });
+
+  residentForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearResidentErrors();
+
+    const editId = document.getElementById('editResidentId').value;
+    const name = document.getElementById('res_fullName').value.trim();
+    const room = document.getElementById('res_room').value.trim();
+    const status = document.getElementById('res_status').value;
+    const doctor = document.getElementById('res_doctor').value.trim();
+    const birthDate = document.getElementById('res_birthDate').value.trim();
+    const taj = document.getElementById('res_taj').value.trim();
+    const phone = document.getElementById('res_phone').value.trim();
+    const notes = document.getElementById('res_notes').value.trim();
+
+    let valid = true;
+    if(!name){
+      document.getElementById('err-res_fullName').textContent = 'A név megadása kötelező.';
+      document.getElementById('res_fullName').classList.add('has-error');
+      valid = false;
+    }
+    if(!room){
+      document.getElementById('err-res_room').textContent = 'A szoba megadása kötelező.';
+      document.getElementById('res_room').classList.add('has-error');
+      valid = false;
+    }
+    if(!valid) return;
+
+    if(editId){
+      const r = residents.find(x => String(x.id) === String(editId));
+      if(r){
+        Object.assign(r, { name, room, status, doctor, birthDate, taj, phone: phone || '—', notes });
+      }
+      showToast('Lakó adatai mentve.');
+      if(activeResidentId === r.id){
+        openResidentDetail(r.id);
+      }
+    } else {
+      residents.push({
+        id: nextResidentId++, name, room, status, doctor, birthDate, taj, phone: phone || '—', notes,
+        medications: [], letters: []
+      });
+      showToast('Új lakó felvéve.');
+    }
+
+    closeResidentModal();
+    if(document.getElementById('residentsListView').style.display !== 'none'){
+      showResidentsList();
+    }
+  });
+
+  function deleteResident(id){
+    const r = residents.find(x => x.id === id);
+    if(!r) return;
+    if(!confirm(`Biztosan törlöd "${r.name}" lakót és minden hozzá tartozó adatot?`)) return;
+    residents.splice(residents.indexOf(r), 1);
+    showToast('Lakó törölve.');
+    showResidentsList();
+  }
+
+  /* ---- Lakó adatlap ---- */
+  function openResidentDetail(id){
+    activeResidentId = id;
+    const r = residents.find(x => x.id === id);
+    if(!r) return;
+
+    document.getElementById('residentsListView').style.display = 'none';
+    const detail = document.getElementById('residentDetailView');
+    detail.style.display = 'block';
+
+    const medsRows = r.medications.length ? r.medications.map(m => `
+      <tr>
+        <td>${escapeHtml(m.name)}</td>
+        <td>${escapeHtml(m.dosage)}</td>
+        <td>${m.qty} db/hó</td>
+        <td>
+          <div class="row-actions" style="justify-content:flex-start;">
+            <button class="icon-btn" title="Gyógyszerírás rögzítése" onclick="recordPrescription(${r.id}, ${m.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15h6M9 11h6"/></svg>
+            </button>
+            <button class="icon-btn" title="Szerkesztés" onclick="openMedicationModal(${r.id}, ${m.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+            </button>
+            <button class="icon-btn danger" title="Törlés" onclick="removeMedication(${r.id}, ${m.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('') : `<tr><td colspan="4"><div class="empty-state">Ehhez a lakóhoz még nincs felvéve gyógyszer.</div></td></tr>`;
+
+    const lettersRows = r.letters.length ? r.letters.map(l => {
+      const urg = urgencyOf(l.valid);
+      const label = urg === 'urgent' ? 'Lejárt' : urg === 'soon' ? 'Hamarosan lejár' : 'Érvényes';
+      const dotClass = urg === 'urgent' ? 'urgent' : urg === 'soon' ? 'soon' : 'today';
+      return `
+      <tr>
+        <td>${escapeHtml(l.specialty)}</td>
+        <td>${escapeHtml(l.doctor)}</td>
+        <td>${l.valid}</td>
+        <td><span class="validity-tag"><span class="dot ${dotClass}"></span>${label}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" title="Szerkesztés" onclick="openLetterModal(${r.id}, ${l.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+            </button>
+            <button class="icon-btn danger" title="Törlés" onclick="removeLetter(${r.id}, ${l.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="5"><div class="empty-state">Nincs rögzített szakorvosi levél.</div></td></tr>`;
+
+    detail.innerHTML = `
+      <button class="back-link" onclick="showResidentsList()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        Vissza a lakók listájához
+      </button>
+
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+            <div class="profile-avatar">${r.name.charAt(0)}</div>
+            <button class="icon-btn" title="Adatok szerkesztése" onclick="openResidentModal(${r.id})">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+            </button>
+          </div>
+          <div class="profile-name">${escapeHtml(r.name)}</div>
+          <div class="profile-sub">${r.room}. szoba · ${r.status}</div>
+
+          <div class="profile-field">
+            <div class="profile-field-label">Születési dátum</div>
+            <div class="profile-field-value">${r.birthDate || '—'}</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">TAJ/CNP</div>
+            <div class="profile-field-value">${r.taj || '—'}</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Családorvos</div>
+            <div class="profile-field-value">${escapeHtml(r.doctor || '—')}</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Telefonszám</div>
+            <div class="profile-field-value">${r.phone}</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Megjegyzés</div>
+            <div class="profile-field-value">${r.notes ? escapeHtml(r.notes) : '—'}</div>
+          </div>
+
+          <button class="btn btn-danger-outline btn-sm" style="width:100%; margin-top:6px;" onclick="deleteResident(${r.id})">Lakó törlése</button>
+        </div>
+
+        <div>
+          <div class="subpanel">
+            <div class="subpanel-header">
+              <h3>Gyógyszerek</h3>
+              <button class="btn btn-secondary btn-sm" onclick="openMedicationModal(${r.id}, null)">+ Gyógyszer hozzáadása</button>
+            </div>
+            <table>
+              <thead><tr><th>Gyógyszer</th><th>Adagolás</th><th>Havi menny.</th><th>Műveletek</th></tr></thead>
+              <tbody>${medsRows}</tbody>
+            </table>
+          </div>
+
+          <div class="subpanel">
+            <div class="subpanel-header">
+              <h3>Szakorvosi levelek</h3>
+              <button class="btn btn-secondary btn-sm" onclick="openLetterModal(${r.id}, null)">+ Levél hozzáadása</button>
+            </div>
+            <table>
+              <thead><tr><th>Szakterület</th><th>Orvos</th><th>Érvényes</th><th>Állapot</th><th style="text-align:right;">Műveletek</th></tr></thead>
+              <tbody>${lettersRows}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function recordPrescription(residentId, medId){
+    const r = residents.find(x => x.id === residentId);
+    const m = r && r.medications.find(x => x.id === medId);
+    if(!m) return;
+    m.last = '2026.08.20';
+    const nextDate = new Date(2026, 8, 20);
+    m.next = `${nextDate.getFullYear()}.${String(nextDate.getMonth()+1).padStart(2,'0')}.${String(nextDate.getDate()).padStart(2,'0')}`;
+    showToast(`Gyógyszerírás rögzítve: ${m.name}.`);
+    openResidentDetail(residentId);
+  }
+
+  function removeMedication(residentId, medId){
+    const r = residents.find(x => x.id === residentId);
+    if(!r) return;
+    if(!confirm('Biztosan törlöd ezt a gyógyszert a lakó listájáról?')) return;
+    r.medications = r.medications.filter(m => m.id !== medId);
+    showToast('Gyógyszer törölve.');
+    openResidentDetail(residentId);
+  }
+
+  /* ---- Gyógyszer modal (felvétel / szerkesztés) ---- */
+  const medicationOverlay = document.getElementById('medicationModalOverlay');
+  const medicationForm = document.getElementById('medicationForm');
+
+  function clearMedicationErrors(){
+    document.getElementById('err-med_name').textContent = '';
+    document.getElementById('med_name').classList.remove('has-error');
+  }
+
+  function openMedicationModal(residentId, medId){
+    clearMedicationErrors();
+    medicationForm.reset();
+
+    const residentSelectField = document.getElementById('med_resident_field');
+    const residentSelect = document.getElementById('med_resident');
+
+    if(residentId){
+      // adott lakóhoz nyitva (adatlapról) - a select mező elrejtve
+      residentSelectField.style.display = 'none';
+      document.getElementById('editMedicationResidentId').value = residentId;
+    } else {
+      // globális nézetből nyitva - lakó kiválasztása szükséges
+      residentSelectField.style.display = 'block';
+      residentSelect.innerHTML = residents.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+      document.getElementById('editMedicationResidentId').value = '';
+    }
+
+    if(medId){
+      const r = residents.find(x => x.id === residentId);
+      const m = r && r.medications.find(x => x.id === medId);
+      if(!m) return;
+      document.getElementById('editMedicationId').value = medId;
+      document.getElementById('med_name').value = m.name;
+      document.getElementById('med_dosage').value = m.dosage;
+      document.getElementById('med_qty').value = m.qty;
+      document.getElementById('med_last').value = m.last;
+      document.getElementById('med_next').value = m.next;
+      document.getElementById('medicationModalTitle').textContent = 'Gyógyszer szerkesztése';
+      document.getElementById('submitMedicationBtn').textContent = 'Mentés';
+    } else {
+      document.getElementById('editMedicationId').value = '';
+      document.getElementById('med_last').value = '2026.08.20';
+      document.getElementById('med_next').value = '2026.09.20';
+      document.getElementById('medicationModalTitle').textContent = 'Új gyógyszer hozzáadása';
+      document.getElementById('submitMedicationBtn').textContent = 'Létrehozás';
+    }
+
+    medicationOverlay.classList.add('show');
+    setTimeout(() => document.getElementById('med_name').focus(), 50);
+  }
+
+  function closeMedicationModal(){
+    medicationOverlay.classList.remove('show');
+  }
+  medicationOverlay.addEventListener('click', e => { if(e.target === medicationOverlay) closeMedicationModal(); });
+
+  medicationForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearMedicationErrors();
+
+    const editId = document.getElementById('editMedicationId').value;
+    let residentId = document.getElementById('editMedicationResidentId').value;
+    if(!residentId){
+      residentId = document.getElementById('med_resident').value;
+    }
+    residentId = Number(residentId);
+
+    const name = document.getElementById('med_name').value.trim();
+    const dosage = document.getElementById('med_dosage').value.trim();
+    const qty = document.getElementById('med_qty').value.trim();
+    const last = document.getElementById('med_last').value.trim();
+    const next = document.getElementById('med_next').value.trim();
+
+    if(!name){
+      document.getElementById('err-med_name').textContent = 'A gyógyszer nevének megadása kötelező.';
+      document.getElementById('med_name').classList.add('has-error');
+      return;
+    }
+
+    const r = residents.find(x => x.id === residentId);
+    if(!r){
+      showToast('Válassz lakót a gyógyszerhez.', true);
+      return;
+    }
+
+    if(editId){
+      const m = r.medications.find(x => x.id === Number(editId));
+      if(m) Object.assign(m, { name, dosage, qty, last, next });
+      showToast('Gyógyszer mentve.');
+    } else {
+      r.medications.push({ id: nextMedicationId++, name, dosage, qty, last, next });
+      showToast('Gyógyszer hozzáadva.');
+    }
+
+    closeMedicationModal();
+    if(activeResidentId === r.id) openResidentDetail(r.id);
+    if(document.getElementById('page-medications').classList.contains('active')){
+      renderMedicationsTable(document.getElementById('medicationSearch').value.trim().toLowerCase());
+    }
+  });
+
+  /* ---- Szakorvosi levél modal (felvétel / szerkesztés) ---- */
+  const letterOverlay = document.getElementById('letterModalOverlay');
+  const letterForm = document.getElementById('letterForm');
+
+  function clearLetterErrors(){
+    ['letter_specialty','letter_valid'].forEach(f => {
+      document.getElementById('err-' + f).textContent = '';
+      document.getElementById(f).classList.remove('has-error');
+    });
+  }
+
+  function openLetterModal(residentId, letterId){
+    clearLetterErrors();
+    letterForm.reset();
+    document.getElementById('editLetterResidentId').value = residentId;
+
+    if(letterId){
+      const r = residents.find(x => x.id === residentId);
+      const l = r && r.letters.find(x => x.id === letterId);
+      if(!l) return;
+      document.getElementById('editLetterId').value = letterId;
+      document.getElementById('letter_specialty').value = l.specialty;
+      document.getElementById('letter_doctor').value = l.doctor;
+      document.getElementById('letter_valid').value = l.valid;
+      document.getElementById('letterModalTitle').textContent = 'Szakorvosi levél szerkesztése';
+      document.getElementById('submitLetterBtn').textContent = 'Mentés';
+    } else {
+      document.getElementById('editLetterId').value = '';
+      document.getElementById('letterModalTitle').textContent = 'Új szakorvosi levél';
+      document.getElementById('submitLetterBtn').textContent = 'Létrehozás';
+    }
+
+    letterOverlay.classList.add('show');
+    setTimeout(() => document.getElementById('letter_specialty').focus(), 50);
+  }
+
+  function closeLetterModal(){
+    letterOverlay.classList.remove('show');
+  }
+  letterOverlay.addEventListener('click', e => { if(e.target === letterOverlay) closeLetterModal(); });
+
+  letterForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearLetterErrors();
+
+    const residentId = Number(document.getElementById('editLetterResidentId').value);
+    const editId = document.getElementById('editLetterId').value;
+    const specialty = document.getElementById('letter_specialty').value.trim();
+    const doctor = document.getElementById('letter_doctor').value.trim();
+    const validDate = document.getElementById('letter_valid').value.trim();
+
+    let valid = true;
+    if(!specialty){
+      document.getElementById('err-letter_specialty').textContent = 'A szakterület megadása kötelező.';
+      document.getElementById('letter_specialty').classList.add('has-error');
+      valid = false;
+    }
+    if(!validDate){
+      document.getElementById('err-letter_valid').textContent = 'Az érvényesség dátuma kötelező.';
+      document.getElementById('letter_valid').classList.add('has-error');
+      valid = false;
+    }
+    if(!valid) return;
+
+    const r = residents.find(x => x.id === residentId);
+    if(!r) return;
+
+    if(editId){
+      const l = r.letters.find(x => x.id === Number(editId));
+      if(l) Object.assign(l, { specialty, doctor, valid: validDate });
+      showToast('Szakorvosi levél mentve.');
+    } else {
+      r.letters.push({ id: nextLetterId++, specialty, doctor, valid: validDate });
+      showToast('Szakorvosi levél hozzáadva.');
+    }
+
+    closeLetterModal();
+    if(activeResidentId === r.id) openResidentDetail(r.id);
+  });
+
+  function removeLetter(residentId, letterId){
+    const r = residents.find(x => x.id === residentId);
+    if(!r) return;
+    if(!confirm('Biztosan törlöd ezt a szakorvosi levelet?')) return;
+    r.letters = r.letters.filter(l => l.id !== letterId);
+    showToast('Szakorvosi levél törölve.');
+    openResidentDetail(residentId);
+  }
+
+  /* ================= GYÓGYSZEREK (globális nézet) ================= */
+  function renderMedicationsTable(filter){
+    const rows = [];
+    residents.forEach(r => {
+      r.medications.forEach(m => {
+        rows.push({ residentId:r.id, residentName:r.name, medId:m.id, med:m.name, last:m.last, next:m.next });
+      });
+    });
+    const q = (filter || '').toLowerCase();
+    const filtered = q ? rows.filter(x => x.med.toLowerCase().includes(q) || x.residentName.toLowerCase().includes(q)) : rows;
+
+    const tbody = document.getElementById('medicationsTableBody');
+    if(filtered.length === 0){
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">Nincs találat.</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = filtered.map(x => {
+      const urg = urgencyOf(x.next);
+      const label = urg === 'urgent' ? 'Lejárt' : urg === 'soon' ? 'Hamarosan esedékes' : 'Rendben';
+      const dotClass = urg === 'urgent' ? 'urgent' : urg === 'soon' ? 'soon' : 'today';
+      return `
+      <tr>
+        <td>${escapeHtml(x.residentName)}</td>
+        <td>${escapeHtml(x.med)}</td>
+        <td>${x.last}</td>
+        <td>${x.next}</td>
+        <td><span class="validity-tag"><span class="dot ${dotClass}"></span>${label}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" title="Szerkesztés" onclick="openMedicationModal(${x.residentId}, ${x.medId})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+            </button>
+            <button class="icon-btn danger" title="Törlés" onclick="removeMedicationGlobal(${x.residentId}, ${x.medId})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function removeMedicationGlobal(residentId, medId){
+    const r = residents.find(x => x.id === residentId);
+    if(!r) return;
+    if(!confirm('Biztosan törlöd ezt a gyógyszeriratást?')) return;
+    r.medications = r.medications.filter(m => m.id !== medId);
+    showToast('Gyógyszeriratás törölve.');
+    renderMedicationsTable(document.getElementById('medicationSearch').value.trim().toLowerCase());
+  }
+
+  /* ================= NAPTÁR ================= */
+  let calendarYear = 2026;
+  let calendarMonth = 7; // 0-indexelt: 7 = augusztus
+
+  const monthNames = ['Január','Február','Március','Április','Május','Június','Július','Augusztus','Szeptember','Október','November','December'];
+
+  function shiftMonth(delta){
+    calendarMonth += delta;
+    if(calendarMonth > 11){ calendarMonth = 0; calendarYear++; }
+    if(calendarMonth < 0){ calendarMonth = 11; calendarYear--; }
+    renderCalendar();
+  }
+
+  function getCalendarEvents(){
+    const events = {}; // 'YYYY.MM.DD' -> [{label, color}]
+    function addEvent(dateStr, label, color){
+      if(!events[dateStr]) events[dateStr] = [];
+      events[dateStr].push({ label, color });
+    }
+    residents.forEach(r => {
+      r.medications.forEach(m => addEvent(m.next, `${r.name.split(' ')[0]} – ${m.name}`, 'red'));
+      r.letters.forEach(l => addEvent(l.valid, `${r.name.split(' ')[0]} – ${l.specialty}`, 'orange'));
+    });
+    addEvent('2026.08.24', 'Tervezett kardiológiai vizsgálat', 'blue');
+    addEvent('2026.08.27', 'Tervezett pszichiátriai vizit', 'blue');
+    return events;
+  }
+
+  function renderCalendar(){
+    document.getElementById('calendarMonthLabel').textContent = `${monthNames[calendarMonth]} ${calendarYear}`;
+    const grid = document.getElementById('calendarGrid');
+    const events = getCalendarEvents();
+
+    const dows = ['H','K','Sze','Cs','P','Szo','V'];
+    let html = dows.map(d => `<div class="calendar-dow">${d}</div>`).join('');
+
+    const firstDay = new Date(calendarYear, calendarMonth, 1);
+    let startOffset = firstDay.getDay() - 1; // hétfő=0
+    if(startOffset < 0) startOffset = 6;
+
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+
+    for(let i = 0; i < startOffset; i++){
+      html += `<div class="calendar-cell empty"></div>`;
+    }
+
+    const isCurrentMonth = (calendarYear === 2026 && calendarMonth === 7);
+
+    for(let day = 1; day <= daysInMonth; day++){
+      const dateStr = `${calendarYear}.${String(calendarMonth+1).padStart(2,'0')}.${String(day).padStart(2,'0')}`;
+      const dayEvents = events[dateStr] || [];
+      const isToday = isCurrentMonth && day === 20;
+
+      const eventsHtml = dayEvents.slice(0, 3).map(ev => `<div class="calendar-event ${ev.color}">${escapeHtml(ev.label)}</div>`).join('');
+
+      html += `
+        <div class="calendar-cell ${isToday ? 'today' : ''}">
+          <div class="calendar-daynum">${day}</div>
+          <div class="calendar-events">${eventsHtml}</div>
+        </div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  /* ================= JELENTÉSEK ================= */
+  function renderReports(){
+    const statusCounts = { 'Aktív':0, 'Figyelendő':0 };
+    residents.forEach(r => statusCounts[r.status] = (statusCounts[r.status] || 0) + 1);
+    const totalResidents = residents.length;
+
+    const statusChart = document.getElementById('statusBarChart');
+    statusChart.innerHTML = Object.entries(statusCounts).map(([label, count]) => {
+      const pct = totalResidents ? Math.round((count / totalResidents) * 100) : 0;
+      const color = label === 'Aktív' ? 'var(--success)' : 'var(--warning)';
+      return `
+        <div class="bar-row">
+          <div class="bar-row-label">${label}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${color};"></div></div>
+          <div class="bar-row-value">${count}</div>
+        </div>`;
+    }).join('');
+
+    let letterCounts = { urgent:0, soon:0, ok:0 };
+    residents.forEach(r => r.letters.forEach(l => letterCounts[urgencyOf(l.valid)]++));
+    const totalLetters = letterCounts.urgent + letterCounts.soon + letterCounts.ok;
+    const letterLabels = [
+      { key:'urgent', label:'Lejárt', color:'var(--error)' },
+      { key:'soon', label:'Hamarosan lejár', color:'var(--warning)' },
+      { key:'ok', label:'Érvényes', color:'var(--success)' }
+    ];
+    const lettersChart = document.getElementById('lettersBarChart');
+    lettersChart.innerHTML = letterLabels.map(l => {
+      const count = letterCounts[l.key];
+      const pct = totalLetters ? Math.round((count / totalLetters) * 100) : 0;
+      return `
+        <div class="bar-row">
+          <div class="bar-row-label">${l.label}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${l.color};"></div></div>
+          <div class="bar-row-value">${count}</div>
+        </div>`;
+    }).join('');
+
+    const historyBody = document.getElementById('historyTableBody');
+    historyBody.innerHTML = historyLog.map(h => `
+      <tr>
+        <td>${h.date}</td>
+        <td>${escapeHtml(h.user)}</td>
+        <td>${escapeHtml(h.action)}</td>
+      </tr>
+    `).join('');
+  }
+
+  /* ================= BEÁLLÍTÁSOK ================= */
+  function fillSettingsForm(){
+    if(!currentUser) return;
+    document.getElementById('settingsFullName').value = currentUser.fullName;
+    document.getElementById('settingsEmail').value = currentUser.username + '@medshelter-demo.hu';
+  }
+
+  function saveSettingsProfile(){
+    if(!currentUser) return;
+    const newName = document.getElementById('settingsFullName').value.trim();
+    if(!newName){
+      showToast('A név nem lehet üres.', true);
+      return;
+    }
+    currentUser.fullName = newName;
+    const u = users.find(x => x.id === currentUser.id);
+    if(u) u.fullName = newName;
+    document.getElementById('topName').textContent = newName;
+    document.getElementById('topAvatar').textContent = newName.charAt(0).toUpperCase();
+    showToast('Profil mentve.');
+  }
+</script>
+
+</body>
+</html>
