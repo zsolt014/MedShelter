@@ -421,3 +421,54 @@ function removeLetter(residentId, letterId){
   showToast('Szakorvosi levél törölve.');
   openResidentDetail(residentId);
 }
+
+// Lakó törlése az adatbázisból (DELETE)
+async function deleteResident(id) {
+  if (!confirm('Biztosan törlöd a lakót az adatbázisból?')) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/residents/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      showToast('Lakó törölve.');
+      showResidentsList();
+    }
+  } catch (err) {
+    showToast('Hiba a törlés során!', true);
+  }
+}
+
+// Űrlap beküldése (Létrehozás & Módosítás támogatása)
+residentForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const editId = document.getElementById('editResidentId').value;
+  
+  const payload = {
+    name: document.getElementById('res_fullName').value.trim(),
+    room: document.getElementById('res_room').value.trim(),
+    status: document.getElementById('res_status').value,
+    doctor: document.getElementById('res_doctor').value.trim(),
+    birth_date: document.getElementById('res_birthDate').value.trim(),
+    taj: document.getElementById('res_taj').value.trim(),
+    phone: document.getElementById('res_phone').value.trim(),
+    notes: document.getElementById('res_notes').value.trim()
+  };
+
+  const url = editId ? `${API_BASE_URL}/residents/${editId}` : `${API_BASE_URL}/residents`;
+  const method = editId ? 'PUT' : 'POST';
+
+  try {
+    const res = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      showToast(editId ? 'Adatok frissítve!' : 'Új lakó elmentve!');
+      closeResidentModal();
+      showResidentsList();
+    }
+  } catch (err) {
+    showToast('Hiba a mentés során!', true);
+  }
+});
