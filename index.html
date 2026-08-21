@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedShelter – Bejelentkezés &amp; Felhasználók</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <svg class="logo-mark" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="12" fill="#123A5E"/>
+        <path d="M22 9L34 16V24C34 30.5 29 34.5 22 37C15 34.5 10 30.5 10 24V16L22 9Z" fill="#EAF3FA"/>
+        <path d="M22 17V29M16 23H28" stroke="#123A5E" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand">MedShelter</span>
+    </div>
+    <p class="login-sub">Hajléktalanszálló Gyógyszerkezelő Rendszer — jelentkezz be az intézményi fiókoddal.</p>
+
+    <div id="loginAlert"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="loginUsername">Felhasználónév</label>
+        <input type="text" id="loginUsername" autocomplete="username" placeholder="pl. admin">
+      </div>
+      <div class="field">
+        <label for="loginPassword">Jelszó</label>
+        <div class="field-input-wrap">
+          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••">
+          <button type="button" class="toggle-visibility" data-target="loginPassword" aria-label="Jelszó megjelenítése">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Bejelentkezés</button>
+    </form>
+
+    <div class="login-footer-link">
+      <a href="#" onclick="return false;">Elfelejtett jelszó?</a>
+    </div>
+
+    <div class="demo-hint">
+     
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="appShell">
+  <div class="topbar">
+    <div class="login-brand">
+      <svg class="logo-mark" width="34" height="34" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="12" fill="#123A5E"/>
+        <path d="M22 9L34 16V24C34 30.5 29 34.5 22 37C15 34.5 10 30.5 10 24V16L22 9Z" fill="#EAF3FA"/>
+        <path d="M22 17V29M16 23H28" stroke="#123A5E" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand">MedShelter</span>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="avatar" id="topAvatar">A</div>
+        <div>
+          <div class="user-chip-name" id="topName">—</div>
+          <div class="user-chip-role" id="topRole">—</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Kijelentkezés</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <button class="nav-item active" id="navDashboard" onclick="showPage('dashboard')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" id="navResidents" onclick="showPage('residents')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Lakók
+      </button>
+      <button class="nav-item" id="navMedications" onclick="showPage('medications')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.5 20.5 21 10a2.12 2.12 0 0 0-3-3L7.5 17.5 6 21z"/><path d="m14 6 3 3"/></svg>
+        Gyógyszerek
+      </button>
+      <button class="nav-item" id="navCalendar" onclick="showPage('calendar')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Naptár
+      </button>
+      <button class="nav-item" id="navReports" onclick="showPage('reports')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg>
+        Jelentések
+      </button>
+      <button class="nav-item" id="navUsers" onclick="showPage('users')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Felhasználók
+      </button>
+      <button class="nav-item" id="navSettings" onclick="showPage('settings')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Beállítások
+      </button>
+    </div>
+
+    <div class="main">
+
+      <!-- ============ DASHBOARD PAGE ============ -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h2>Áttekintés</h2>
+            <p>A mai legfontosabb tudnivalók egy pillantásra.</p>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon" style="background:var(--secondary-light);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statResidentsCount">0</div>
+            <div class="stat-label">Lakók száma</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon" style="background:var(--success-light);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D7042" stroke-width="2"><path d="M10.5 20.5 21 10a2.12 2.12 0 0 0-3-3L7.5 17.5 6 21z"/><path d="m14 6 3 3"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statActiveMedsCount">0</div>
+            <div class="stat-label">Aktív gyógyszerek</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon" style="background:var(--error-light);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statExpiringMedsCount">0</div>
+            <div class="stat-label">Lejáró gyógyszeriratások</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon" style="background:var(--warning-light);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statExpiringLettersCount">0</div>
+            <div class="stat-label">Lejáró szakorvosi levelek</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon" style="background:#F1EAFB;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B3FA0" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M13.5 10h5M13.5 14h3.5"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statExpiringBuletinCount">0</div>
+            <div class="stat-label">Lejáró buletinek</div>
+          </div>
+        </div>
+
+        <div class="section-title">Figyelmeztetések</div>
+        <div class="alert-grid">
+          <div class="alert-block urgent">
+            <div class="alert-block-title">
+              <span class="dot urgent"></span> Sürgős
+            </div>
+            <ul class="alert-list" id="alertUrgentList">
+              <li class="empty">Betöltés...</li>
+            </ul>
+          </div>
+
+          <div class="alert-block today">
+            <div class="alert-block-title">
+              <span class="dot today"></span> Mai teendők
+            </div>
+            <ul class="alert-list" id="alertTodayList">
+              <li class="empty">Betöltés...</li>
+            </ul>
+          </div>
+
+          <div class="alert-block soon">
+            <div class="alert-block-title">
+              <span class="dot soon"></span> Hamarosan lejár
+            </div>
+            <ul class="alert-list" id="alertSoonList">
+              <li class="empty">Betöltés...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ LAKÓK PAGE (list + detail) ============ -->
+      <div class="page" id="page-residents">
+
+        <div id="residentsListView">
+          <div class="page-header">
+            <div>
+              <h2>Lakók</h2>
+              <p>A szálló lakóinak listája, gyógyszereikkel és kezelőorvosukkal.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openResidentModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Új lakó
+            </button>
+          </div>
+
+          <div class="search-bar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="residentSearch" placeholder="Keresés név, gyógyszer vagy orvos szerint...">
+          </div>
+
+          <div class="panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Név</th>
+                  <th>Szoba</th>
+                  <th>Családorvos</th>
+                  <th>Állapot</th>
+                  <th style="text-align:right;">Műveletek</th>
+                </tr>
+              </thead>
+              <tbody id="residentsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="residentDetailView" style="display:none;"></div>
+      </div>
+
+      <!-- ============ GYÓGYSZEREK PAGE ============ -->
+      <div class="page" id="page-medications">
+        <div class="page-header">
+          <div>
+            <h2>Gyógyszeriratások</h2>
+            <p>Az összes lakó aktuális gyógyszeriratásainak áttekintése egy helyen.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openMedicationModal(null)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Új gyógyszeriratás
+          </button>
+        </div>
+
+        <div class="search-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="medicationSearch" placeholder="Keresés gyógyszer vagy lakó szerint...">
+        </div>
+
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Lakó</th>
+                <th>Gyógyszer</th>
+                <th>Utolsó iratás</th>
+                <th>Következő esedékes</th>
+                <th>Állapot</th>
+                <th style="text-align:right;">Műveletek</th>
+              </tr>
+            </thead>
+            <tbody id="medicationsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ NAPTÁR PAGE ============ -->
+      <div class="page" id="page-calendar">
+        <div class="page-header">
+          <div>
+            <h2>Naptár</h2>
+            <p>Lejáró iratások, szakorvosi levelek és tervezett vizsgálatok havi nézetben.</p>
+          </div>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="calendar-toolbar">
+            <button class="icon-btn" onclick="shiftMonth(-1)" aria-label="Előző hónap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div class="calendar-month-label" id="calendarMonthLabel">—</div>
+            <button class="icon-btn" onclick="shiftMonth(1)" aria-label="Következő hónap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+
+          <div class="calendar-legend">
+            <span><span class="dot urgent"></span> Lejáró gyógyszeriratás</span>
+            <span><span class="dot soon"></span> Lejáró szakorvosi levél</span>
+            <span><span class="dot" style="background:#6B3FA0;"></span> Lejáró buletin</span>
+            <span><span class="dot" style="background:var(--secondary);"></span> Tervezett orvosi vizsgálat</span>
+          </div>
+
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+      </div>
+
+      <!-- ============ JELENTÉSEK PAGE ============ -->
+      <div class="page" id="page-reports">
+        <div class="page-header">
+          <div>
+            <h2>Jelentések</h2>
+            <p>Összesített statisztikák és a rendszer módosítási előzményei.</p>
+          </div>
+        </div>
+
+        <div class="report-grid">
+          <div class="panel panel-pad">
+            <h3 style="margin-top:0; font-size:0.95rem;">Lakók állapot szerint</h3>
+            <div class="bar-chart" id="statusBarChart"></div>
+          </div>
+          <div class="panel panel-pad">
+            <h3 style="margin-top:0; font-size:0.95rem;">Szakorvosi levelek érvényessége</h3>
+            <div class="bar-chart" id="lettersBarChart"></div>
+          </div>
+        </div>
+
+        <div class="panel panel-pad" style="margin-bottom:20px;">
+          <h3 style="margin-top:0; font-size:0.95rem;">Buletinek érvényessége</h3>
+          <div class="bar-chart" id="buletinBarChart"></div>
+        </div>
+
+        <div class="panel">
+          <div class="subpanel-header">
+            <h3>Előzmények (napló)</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Dátum</th>
+                <th>Felhasználó</th>
+                <th>Művelet</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ BEÁLLÍTÁSOK PAGE ============ -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <div>
+            <h2>Beállítások</h2>
+            <p>Profil- és értesítési beállítások kezelése.</p>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="panel panel-pad">
+            <h3 style="margin-top:0; font-size:0.95rem;">Profil</h3>
+            <div class="field">
+              <label for="settingsFullName">Teljes név</label>
+              <input type="text" id="settingsFullName">
+            </div>
+            <div class="field">
+              <label for="settingsEmail">E-mail cím</label>
+              <input type="text" id="settingsEmail" placeholder="pl. nev@zetelaki-camping-demo.hu">
+            </div>
+            <button class="btn btn-secondary" onclick="saveSettingsProfile()">Profil mentése</button>
+          </div>
+
+          <div class="panel panel-pad">
+            <h3 style="margin-top:0; font-size:0.95rem;">Értesítések</h3>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-row-label">Lejáró gyógyszeriratások</div>
+                <div class="toggle-row-sub">Figyelmeztetés belépéskor, ha egy iratás lejár.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="switch-track"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-row-label">Lejáró szakorvosi levelek</div>
+                <div class="toggle-row-sub">Figyelmeztetés 30 nappal a lejárat előtt.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="switch-track"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-row-label">E-mail emlékeztetők</div>
+                <div class="toggle-row-sub">Napi összefoglaló küldése e-mailben.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="switch-track"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ FELHASZNÁLÓK PAGE ============ -->
+      <div class="page" id="page-users">
+        <div class="page-header">
+          <div>
+            <h2>Felhasználók kezelése</h2>
+            <p>Hozz létre és kezelj bejelentkezési fiókokat a dolgozók és vezetők számára.</p>
+          </div>
+          <button class="btn btn-primary" id="openCreateBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Új felhasználó
+          </button>
+        </div>
+
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Név / Felhasználónév</th>
+                <th>Szerepkör</th>
+                <th style="text-align:right;">Műveletek</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+          <div class="footer-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Ez egy kattintható prototípus: a felhasználók és jelszavak csak ennek a böngészőlapnak a memóriájában élnek, frissítéskor elvesznek. Éles verzióban a jelszavakat a szerveren, sózva és hash-elve kell tárolni (pl. bcrypt), soha nem szabad azokat egyszerű szövegként menteni vagy a kliensen kezelni.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ USER MODAL (create / edit) ============ -->
+<div class="modal-overlay" id="userModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Új felhasználó létrehozása</h3>
+      <button class="modal-close" onclick="closeUserModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="userForm" novalidate>
+      <input type="hidden" id="editUserId" value="">
+
+      <div class="field">
+        <label for="fullName">Teljes név</label>
+        <input type="text" id="fullName" placeholder="pl. Kovács Ágnes">
+        <div class="error-text" id="err-fullName"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="username">Felhasználónév</label>
+          <input type="text" id="username" placeholder="pl. agnes">
+          <div class="error-text" id="err-username"></div>
+        </div>
+        <div class="field">
+          <label for="role">Szerepkör</label>
+          <select id="role">
+            <option value="Admin">Admin</option>
+            <option value="Dolgozó" selected>Dolgozó</option>
+            <option value="Vezető">Vezető</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="password">Jelszó</label>
+          <div class="field-input-wrap">
+            <input type="password" id="password" placeholder="min. 6 karakter">
+            <button type="button" class="toggle-visibility" data-target="password" aria-label="Jelszó megjelenítése">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="error-text" id="err-password"></div>
+        </div>
+        <div class="field">
+          <label for="passwordConfirm">Jelszó megerősítése</label>
+          <input type="password" id="passwordConfirm" placeholder="ismét">
+          <div class="error-text" id="err-passwordConfirm"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeUserModal()">Mégse</button>
+        <button type="submit" class="btn btn-primary" id="submitUserBtn">Létrehozás</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ LAKÓ MODAL (create / edit) ============ -->
+<div class="modal-overlay" id="residentModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="residentModalTitle">Új lakó felvétele</h3>
+      <button class="modal-close" onclick="closeResidentModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="residentForm" novalidate>
+      <input type="hidden" id="editResidentId" value="">
+
+      <div class="field">
+        <label for="res_fullName">Teljes név</label>
+        <input type="text" id="res_fullName" placeholder="pl. Kiss János">
+        <div class="error-text" id="err-res_fullName"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="res_room">Szoba</label>
+          <input type="text" id="res_room" placeholder="pl. 14">
+          <div class="error-text" id="err-res_room"></div>
+        </div>
+        <div class="field">
+          <label for="res_status">Állapot</label>
+          <select id="res_status">
+            <option value="Aktív" selected>Aktív</option>
+            <option value="Figyelendő">Figyelendő</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="res_doctor">Családorvos</label>
+          <input type="text" id="res_doctor" placeholder="pl. Dr. Demese">
+        </div>
+        <div class="field">
+          <label for="res_birthDate">Születési dátum</label>
+          <input type="date" id="res_birthDate">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="res_taj">TAJ/CNP</label>
+          <input type="text" id="res_taj" placeholder="pl. 123-456-789">
+        </div>
+        <div class="field">
+          <label for="res_phone">Telefonszám</label>
+          <input type="text" id="res_phone" placeholder="opcionális">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="res_buletinNumber">Buletin szám</label>
+          <input type="text" id="res_buletinNumber" placeholder="pl. HR 123456">
+        </div>
+        <div class="field">
+          <label for="res_buletinExpiry">Buletin érvényessége</label>
+          <input type="date" id="res_buletinExpiry">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="res_notes">Megjegyzés</label>
+        <input type="text" id="res_notes" placeholder="opcionális">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeResidentModal()">Mégse</button>
+        <button type="submit" class="btn btn-primary" id="submitResidentBtn">Létrehozás</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ GYÓGYSZER MODAL (create / edit) ============ -->
+<div class="modal-overlay" id="medicationModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="medicationModalTitle">Új gyógyszer hozzáadása</h3>
+      <button class="modal-close" onclick="closeMedicationModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="medicationForm" novalidate>
+      <input type="hidden" id="editMedicationId" value="">
+      <input type="hidden" id="editMedicationResidentId" value="">
+
+      <div class="field" id="med_resident_field">
+        <label for="med_resident">Lakó</label>
+        <select id="med_resident"></select>
+      </div>
+
+      <div id="medicationRowsContainer"></div>
+
+      <button type="button" class="btn btn-secondary btn-sm" id="addMedRowBtn" onclick="addMedicationRow()" style="margin-bottom:16px;">
+        + Újabb gyógyszer hozzáadása ehhez a felíráshoz
+      </button>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="med_last">Felírás dátuma</label>
+          <input type="date" id="med_last">
+        </div>
+        <div class="field">
+          <label for="med_next">Következő esedékes (max. 3 hónap)</label>
+          <input type="date" id="med_next">
+          <div class="error-text" id="err-med_next"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeMedicationModal()">Mégse</button>
+        <button type="submit" class="btn btn-primary" id="submitMedicationBtn">Létrehozás</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ SZAKORVOSI LEVÉL MODAL (create / edit) ============ -->
+<div class="modal-overlay" id="letterModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="letterModalTitle">Új szakorvosi levél</h3>
+      <button class="modal-close" onclick="closeLetterModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form id="letterForm" novalidate>
+      <input type="hidden" id="editLetterId" value="">
+      <input type="hidden" id="editLetterResidentId" value="">
+
+      <div class="field">
+        <label for="letter_specialty">Szakterület</label>
+        <input type="text" id="letter_specialty" placeholder="pl. Kardiológia">
+        <div class="error-text" id="err-letter_specialty"></div>
+      </div>
+
+      <div class="field">
+        <label for="letter_doctor">Orvos</label>
+        <input type="text" id="letter_doctor" placeholder="pl. Dr. Popescu">
+      </div>
+
+      <div class="field">
+        <label for="letter_valid">Érvényesség dátuma</label>
+        <input type="date" id="letter_valid">
+        <div class="error-text" id="err-letter_valid"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeLetterModal()">Mégse</button>
+        <button type="submit" class="btn btn-primary" id="submitLetterBtn">Létrehozás</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- JavaScript Modulok betöltése a megfelelő sorrendben -->
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/pages/auth.js"></script>
+<script src="js/pages/dashboard.js"></script>
+<script src="js/pages/residents.js"></script>
+<script src="js/pages/medications.js"></script>
+<script src="js/pages/calendar.js"></script>
+<script src="js/pages/reports.js"></script>
+<script src="js/pages/settings.js"></script>
+<script src="js/pages/users.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
