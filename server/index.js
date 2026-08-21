@@ -142,12 +142,12 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({
       id: user.id,
-      fullName: user.full_name,
+      fullName: user.full_name || user.fullname || user.username,
       username: user.username,
       role: user.role
     });
   } catch (err) {
-    console.error(err);
+    console.error('Adatbázis hiba:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
